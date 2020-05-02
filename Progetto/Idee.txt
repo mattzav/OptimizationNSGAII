@@ -1,0 +1,7 @@
+1) Ogni nodo un profitto
+2) Ogni arco una durata
+3) Nodi opzionali e nodi da visitare per forza
+
+max profitto
+min max durata tra i veicoli
+min durataMax - durataMin (ha senso avendo già il secondo obiettivo?)
