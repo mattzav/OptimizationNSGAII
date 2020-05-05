@@ -42,9 +42,9 @@
     <fullyQualifiedTypeName name="java.util.Collections"/>
     <fullyQualifiedTypeName name="ObjectiveComparator"/>
     <fullyQualifiedTypeName name="java.util.Comparator"/>
-    <fullyQualifiedTypeName name="java.util.ArrayList"/>
     <fullyQualifiedTypeName name="Graph"/>
     <fullyQualifiedTypeName name="Vehicles"/>
-    <fullyQualifiedTypeName name="Main"/>
     <fullyQualifiedTypeName name="java.lang.RuntimeException"/>
+    <fullyQualifiedTypeName name="java.util.ArrayList"/>
+    <fullyQualifiedTypeName name="Main"/>
 </qualifiedTypeNameHistroy>
