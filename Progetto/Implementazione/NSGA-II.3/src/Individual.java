@@ -44,7 +44,7 @@ public class Individual {
 				}
 			}
 		}
-
+		
 		double profit = 0;
 		for(Integer i : visited)
 			profit += Main.graph.getProfit(i);

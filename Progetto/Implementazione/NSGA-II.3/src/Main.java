@@ -8,20 +8,20 @@ public class Main {
 	static Random r = new Random();
 	static int numObjective = 3;
 	static boolean[] maxOrMinForThatObjective = new boolean[] { true, true, false };
-	static int populationSize = 300 * 2; // numero pari
+	static int populationSize = 2 * 2; // numero pari
 	static double minProfitNeeded = 2000;
 	static int numIteration = 200;
 	static double mutationProb = 0.2;
 
 	static Graph graph;
-	static int numNodesInTheGraph = 200;
+	static int numNodesInTheGraph = 5;
 
 	static ArrayList<Vehicles> vehicles;
-	static int numMaxVehicles = 30;
+	static int numMaxVehicles = 4;
 
 	static HashMap<Integer, ArrayList<Integer>> reachableUsingDrone;
 	static double maxBatteryConsumption = 14000;
-	static int numExtraNodesForDroneInTheGraph = 300;
+	static int numExtraNodesForDroneInTheGraph = 10;
 
 	static ArrayList<Integer> copyNodes;
 	static ArrayList<Integer> copyNodesDrones;
@@ -36,35 +36,30 @@ public class Main {
 		createRandomVehicles(); // creiamo i veicoli a disposizione con capacità random
 
 		ArrayList<Individual> P = initPopulation();
-		// System.out.println(P);
-
-		ArrayList<ArrayList<Individual>> F = fast_non_dominated_sort(P);
-		for (int front = 0; front < F.size(); front++) {
-			crowding_distance_assignment(F.get(front));
-			 System.out.println(" in the fronth " + front + " there are " + F.get(front).size());
-		}
-
-		while (numIteration-- > 0) {
-
-			ArrayList<Individual> Q = generateChildren(P);
-
-			ArrayList<Individual> union = new ArrayList<Individual>(Q);
-			union.addAll(P);
-			F = fast_non_dominated_sort(union);
-
-			P = updatePopulation(F);
-
-			// System.out.println(P.size());
-		}
-		F = fast_non_dominated_sort(P);
-
-		for (int front = 0; front < F.size(); front++) {
-			System.out.println(" in the fronth " + front + " there are " + F.get(front).size());
-			System.out.println(F.get(front));
-//			System.out.println(F.get(front));
-			// crowding_distance_assignment(F.get(front));
-		}
-		
+		System.out.println(P);
+		/*
+		 * ArrayList<ArrayList<Individual>> F = fast_non_dominated_sort(P); for (int
+		 * front = 0; front < F.size(); front++) {
+		 * crowding_distance_assignment(F.get(front));
+		 * System.out.println(" in the fronth " + front + " there are " +
+		 * F.get(front).size()); }
+		 * 
+		 * while (numIteration-- > 0) {
+		 * 
+		 * ArrayList<Individual> Q = generateChildren(P);
+		 * 
+		 * ArrayList<Individual> union = new ArrayList<Individual>(Q); union.addAll(P);
+		 * F = fast_non_dominated_sort(union);
+		 * 
+		 * P = updatePopulation(F);
+		 * 
+		 * // System.out.println(P.size()); } F = fast_non_dominated_sort(P);
+		 * 
+		 * for (int front = 0; front < F.size(); front++) {
+		 * System.out.println(" in the fronth " + front + " there are " +
+		 * F.get(front).size()); // System.out.println(F.get(front)); //
+		 * crowding_distance_assignment(F.get(front)); }
+		 */
 	}
 
 	private static ArrayList<Individual> updatePopulation(ArrayList<ArrayList<Individual>> union) {
@@ -130,7 +125,8 @@ public class Main {
 			else
 				winning_second = fourth;
 
-			//System.out.println("FIRST \n" + winning_first + "\n SECOND \n" + winning_second);
+			// System.out.println("FIRST \n" + winning_first + "\n SECOND \n" +
+			// winning_second);
 
 			// just because the following crossover operator suppose that the vehicles in
 			// winning_first are more or equal than the ones in winning_second,
@@ -179,22 +175,26 @@ public class Main {
 			Individual firstInd = new Individual(currentIndividualVehiclesFC);
 			Individual secondInd = new Individual(currentIndividualVehiclesSC);
 
-			//System.out.println("AFTER CROSSOVER \n FIRST \n" + firstInd + "\n SECOND \n" + secondInd);
+			// System.out.println("AFTER CROSSOVER \n FIRST \n" + firstInd + "\n SECOND \n"
+			// + secondInd);
 
 			recoverFeasibility(firstInd);
 			recoverFeasibility(secondInd);
 
-			//System.out.println("AFTER FEASIBILITY \n FIRST \n" + firstInd + "\n SECOND \n" + secondInd);
+			// System.out.println("AFTER FEASIBILITY \n FIRST \n" + firstInd + "\n SECOND
+			// \n" + secondInd);
 
 			mutation(firstInd);
 			mutation(secondInd);
 
-			//System.out.println("AFTER MUTATION \n FIRST \n" + firstInd + "\n SECOND \n" + secondInd);
+			// System.out.println("AFTER MUTATION \n FIRST \n" + firstInd + "\n SECOND \n" +
+			// secondInd);
 
 			postOptimize(firstInd);
 			postOptimize(secondInd);
 
-			//System.out.println("AFTER OPTIMIZATION \n FIRST \n" + firstInd + "\n SECOND \n" + secondInd);
+			// System.out.println("AFTER OPTIMIZATION \n FIRST \n" + firstInd + "\n SECOND
+			// \n" + secondInd);
 
 			children.add(firstInd);
 			children.add(secondInd);
@@ -207,7 +207,8 @@ public class Main {
 		if (s.getGenotypeVehicles().size() == 1)
 			return;
 
-		// se un nodo è visitato più di una volta, lo lascio solo nel veicolo dove ha la rotta per il drone più lunga
+		// se un nodo è visitato più di una volta, lo lascio solo nel veicolo dove ha la
+		// rotta per il drone più lunga
 		for (int i = 1; i < numNodesInTheGraph; i++) {
 			if (s.getVisited().contains(i)) {
 
@@ -257,16 +258,16 @@ public class Main {
 				break;
 			int toAssign = busiest.getTour().get(1); // prendo l'ultimo veicolo (rotta piu lunga)
 			double droneTour = busiest.getCurrentDroneTourLength().get(toAssign);
-			
+
 //			System.out.println(busiest.getCurrentDroneTourLength());
 			ArrayList<Integer> droneTourPath = busiest.getDroneTour().get(toAssign);
 			double resourceNeeded = 0;
-			for(Integer i : droneTourPath)
-				resourceNeeded+=graph.getNeededResource(i);
+			for (Integer i : droneTourPath)
+				resourceNeeded += graph.getNeededResource(i);
 
 			for (int index = 0; index < s.getGenotypeVehicles().size() - 1; index++) {
 				Vehicles v = s.getGenotypeVehicles().get(index);
-				if (v.getCurrentCapacity() >= graph.getNeededResource(toAssign)+resourceNeeded  && v.getTourLength()
+				if (v.getCurrentCapacity() >= graph.getNeededResource(toAssign) + resourceNeeded && v.getTourLength()
 						+ graph.getNormalizedDistance(v.getTour().get(v.getTour().size() - 1), toAssign)
 						+ droneTour < busiest.getTourLength()) {
 
@@ -570,36 +571,47 @@ public class Main {
 				}
 			}
 
-			// create tour for each vehicle and for each visited node
-			for (int j = 0; j < numVehicles; j++) {
-				for (Integer k : vehiclesToUse.get(j).getTour()) {
-					if (k == 0 || reachableUsingDrone.get(k).size() == 0)
-						continue;
-					double energyConsumed = 0;
-					int startingIndexRandom = r.nextInt(reachableUsingDrone.get(k).size());
+			HashMap<Pair, Double> energyConsumed = new HashMap<Pair, Double>();
 
-					// scegliamo un indice di partenza random e usiamo il modulo per scorrere in
-					// modo ciclio la lista (da i a n e da 0 a i-1)
-					for (int index = startingIndexRandom; index < startingIndexRandom
-							+ reachableUsingDrone.get(k).size(); index++) {
-						int selectedNode = reachableUsingDrone.get(k).get(index % reachableUsingDrone.get(k).size());
-						if (graph.getNormalizedDistance(k, selectedNode) + energyConsumed <= maxBatteryConsumption
-								&& r.nextDouble() <= 0.35 && nodesForTheDrones.contains(selectedNode)
-								&& vehiclesToUse.get(j).getCurrentCapacity() >= graph.getNeededResource(selectedNode)) {
-							nodesForTheDrones.remove(Integer.valueOf(selectedNode));
-							vehiclesToUse.get(j).addExtraNode(k, selectedNode,
-									graph.getNormalizedDistance(k, selectedNode), graph.getProfit(selectedNode));
-							energyConsumed += graph.getNormalizedDistance(k, selectedNode);
-						}
-					}
+			// add node for drone for random vehicles and random node as starting point
+			for (int j = 0; j < numExtraNodesForDroneInTheGraph * 2; j++) {
+				int randomIndex = r.nextInt(numVehicles); // veicolo scelto random
+				int sizeOfItsPath = vehiclesToUse.get(randomIndex).getTour().size();
+				if (sizeOfItsPath <= 1)
+					continue;
+				int nodeRandom = vehiclesToUse.get(randomIndex).getTour().get(r.nextInt(sizeOfItsPath - 1) + 1);
+
+				if (reachableUsingDrone.get(nodeRandom).size() == 0)
+					continue;
+
+				if (energyConsumed.get(new Pair(randomIndex, nodeRandom)) == null)
+					energyConsumed.put(new Pair(randomIndex, nodeRandom), 0.);
+
+				int destination = reachableUsingDrone.get(nodeRandom)
+						.get(r.nextInt(reachableUsingDrone.get(nodeRandom).size()));
+				// scegliamo un indice di partenza random e usiamo il modulo per scorrere in
+				// modo ciclio la lista (da i a n e da 0 a i-1)
+
+				if (graph.getNormalizedDistance(nodeRandom, destination)
+						+ energyConsumed.get(new Pair(randomIndex, nodeRandom)) <= maxBatteryConsumption
+						&& nodesForTheDrones.contains(destination) && vehiclesToUse.get(randomIndex)
+								.getCurrentCapacity() >= graph.getNeededResource(destination)) {
+					nodesForTheDrones.remove(Integer.valueOf(destination));
+					vehiclesToUse.get(randomIndex).addExtraNode(nodeRandom, destination,
+							graph.getNormalizedDistance(nodeRandom, destination), graph.getProfit(destination));
+					energyConsumed.replace(new Pair(randomIndex, nodeRandom),
+							energyConsumed.get(new Pair(randomIndex, nodeRandom))
+									+ graph.getNormalizedDistance(nodeRandom, destination));
 				}
-			}
 
+			}
 			Individual toAdd = new Individual(vehiclesToUse);
 			recoverFeasibility(toAdd);
 			toReturn.add(toAdd);
 		}
+
 		return toReturn;
+
 	}
 
 	private static void recoverFeasibility(Individual toAdd) {
