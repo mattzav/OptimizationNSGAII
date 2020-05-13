@@ -25,10 +25,7 @@
     <fullyQualifiedTypeName name="jxl.write.WriteException"/>
     <fullyQualifiedTypeName name="com.github.cliftonlabs.json_simple.JsonObject"/>
     <fullyQualifiedTypeName name="jxl.write.Label"/>
-    <fullyQualifiedTypeName name="com.sun.tools.javac.util.Pair"/>
     <fullyQualifiedTypeName name="ScheduloDalleAlle"/>
-    <fullyQualifiedTypeName name="com.sun.org.apache.bcel.internal.generic.NEW"/>
-    <fullyQualifiedTypeName name="Pair"/>
     <fullyQualifiedTypeName name="Materia"/>
     <fullyQualifiedTypeName name="sun.security.provider.DSAKeyPairGenerator.Current"/>
     <fullyQualifiedTypeName name="java.util.Set"/>
@@ -36,7 +33,6 @@
     <fullyQualifiedTypeName name="java.util.TreeSet"/>
     <fullyQualifiedTypeName name="java.util.HashSet"/>
     <fullyQualifiedTypeName name="java.lang.Double"/>
-    <fullyQualifiedTypeName name="java.util.HashMap"/>
     <fullyQualifiedTypeName name="javax.management.RuntimeErrorException"/>
     <fullyQualifiedTypeName name="Individual"/>
     <fullyQualifiedTypeName name="java.util.Collections"/>
@@ -47,4 +43,10 @@
     <fullyQualifiedTypeName name="java.lang.RuntimeException"/>
     <fullyQualifiedTypeName name="java.util.ArrayList"/>
     <fullyQualifiedTypeName name="Main"/>
+    <fullyQualifiedTypeName name="java.util.HashMap"/>
+    <fullyQualifiedTypeName name="com.sun.tools.javac.util.Pair"/>
+    <fullyQualifiedTypeName name="jdk.javadoc.internal.doclets.toolkit.util.Utils.Pair"/>
+    <fullyQualifiedTypeName name="com.sun.org.apache.bcel.internal.generic.NEW"/>
+    <fullyQualifiedTypeName name="Pair"/>
+    <fullyQualifiedTypeName name="java.lang.Exception"/>
 </qualifiedTypeNameHistroy>
