@@ -5,7 +5,7 @@ public class Graph {
 	private DurationParameters[][] arcs;
 	private double profit[];
 	private int neededResource[];
-	
+
 	public Graph(int numNodes) {
 		this.numNodes = numNodes;
 		this.neededResource = new int[numNodes];
@@ -13,20 +13,20 @@ public class Graph {
 		this.arcs = new DurationParameters[numNodes][numNodes];
 		initRandom();
 	}
-	
+
 	private void initRandom() {
 		for (int i = 0; i < numNodes; i++) {
 			if (i > 0) {
-				profit[i] = 10 + 30* ((Main.r.nextInt() % 20) + 20) % 20; // profit from 1 to 20
-				neededResource[i] = ((Main.r.nextInt() % 20) + 20) % 20; // needed resource from 1 to 20
-			}else {
+				profit[i] = 10 + 30 * ((Main.r.nextInt() % 20) + 20) % 20; // profit from 1 to 20
+				neededResource[i] = 1 + ((Main.r.nextInt() % 20) + 20) % 20; // needed resource from 1 to 20
+			} else {
 				profit[i] = 0;
 				neededResource[i] = 0;
 			}
 
 			for (int j = 0; j < numNodes; j++)
-				arcs[i][j] = new DurationParameters(1+((Main.r.nextInt() % 20) + 20) % 20,1+
-						((Main.r.nextInt() % 30) + 30) % 30); // valore
+				arcs[i][j] = new DurationParameters(1 + ((Main.r.nextInt() % 20) + 20) % 20,
+						1 + ((Main.r.nextInt() % 30) + 30) % 30); // valore
 			// atteso
 			// tra 0 e
 			// 20,

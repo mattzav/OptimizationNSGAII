@@ -1,30 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="initPop"/>
+		<item key="selection" value="Resource 370"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="initPop"/>
-			<item value="initPo"/>
-			<item value="initPO"/>
-			<item value="init"/>
-			<item value="reco"/>
-			<item value="300"/>
-			<item value="Resource 73"/>
-			<item value="Resource 76"/>
-			<item value="Resource 125"/>
-			<item value="Resource 119"/>
-			<item value="Resource 183"/>
-			<item value="Resource 19"/>
-			<item value="postOp"/>
-			<item value="crossOver"/>
-			<item value="System."/>
+			<item value="Resource 370"/>
+			<item value="Resource 235"/>
+			<item value="Resource 305"/>
+			<item value="Resource 324"/>
+			<item value="Resource 498"/>
+			<item value="Resource 417"/>
+			<item value="Resource 144"/>
+			<item value="Resource 193"/>
+			<item value="Resource 96"/>
+			<item value="Resource 71"/>
+			<item value="Resource 78"/>
+			<item value="Resource 133"/>
+			<item value="Resource 1333"/>
+			<item value="Resource 0"/>
+			<item value="Resource "/>
 		</list>
 		<list key="replacehistory">
+			<item value="//checkCapacity()"/>
+			<item value="\\checkCapacity()"/>
 			<item value="aula"/>
 			<item value="Aula"/>
 			<item value="lab"/>
@@ -35,10 +37,10 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="551"/>
-		<item key="DIALOG_Y_ORIGIN" value="456"/>
-		<item key="DIALOG_WIDTH" value="964"/>
-		<item key="DIALOG_HEIGHT" value="592"/>
-		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
+		<item key="DIALOG_X_ORIGIN" value="650"/>
+		<item key="DIALOG_Y_ORIGIN" value="336"/>
+		<item key="DIALOG_WIDTH" value="284"/>
+		<item key="DIALOG_HEIGHT" value="391"/>
+		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|5|0|Segoe UI"/>
 	</section>
 </section>

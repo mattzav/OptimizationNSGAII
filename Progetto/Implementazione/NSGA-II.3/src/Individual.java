@@ -19,9 +19,12 @@ public class Individual {
 	}
 
 	public void updateSolution(ArrayList<Vehicles> v) {
-		if (v != null)
-			genotypeVehicles = new ArrayList<Vehicles>(v);
+		if (v != null) {
+			genotypeVehicles = new ArrayList<Vehicles>();
+			for (Vehicles veic : v)
+				genotypeVehicles.add(new Vehicles(veic));
 
+		}
 		objectiveValue[0] = genotypeVehicles.size(); // numVehicles
 
 		visited = new TreeSet<Integer>();
@@ -44,9 +47,9 @@ public class Individual {
 				}
 			}
 		}
-		
+
 		double profit = 0;
-		for(Integer i : visited)
+		for (Integer i : visited)
 			profit += Main.graph.getProfit(i);
 		objectiveValue[2] = profit;
 	}

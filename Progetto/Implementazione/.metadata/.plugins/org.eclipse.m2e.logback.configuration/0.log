@@ -550,3 +550,5 @@ Caused by: java.io.FileNotFoundException: C:\Users\Matte\Desktop\Universita\Opti
 2020-05-05 16:42:00,502 [Worker-5: Decoration Calculation] WARN  org.eclipse.jgit.util.FS - Cannot run program "git" (in directory "\usr\bin"): CreateProcess error=2, Impossibile trovare il file specificato
 2020-05-13 11:54:51,956 [Worker-6: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
 2020-05-13 11:54:58,107 [Worker-8: Decoration Calculation] WARN  org.eclipse.jgit.util.FS - Cannot run program "git" (in directory "\usr\bin"): CreateProcess error=2, Impossibile trovare il file specificato
+2020-05-14 10:52:16,615 [Worker-2: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2020-05-14 10:52:20,588 [Worker-3: Decoration Calculation] WARN  org.eclipse.jgit.util.FS - Cannot run program "git" (in directory "\usr\bin"): CreateProcess error=2, Impossibile trovare il file specificato

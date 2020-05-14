@@ -10,18 +10,18 @@ public class Main {
 	static boolean[] maxOrMinForThatObjective = new boolean[] { true, true, false };
 	static int populationSize = 2 * 2; // numero pari
 	static double minProfitNeeded = 500;
-	static int numIteration = 2;
-	static double mutationProb = 0.6;
+	static int numIteration = 2000;
+	static double mutationProb = 0.2;
 
 	static Graph graph;
-	static int numNodesInTheGraph = 5;
+	static int numNodesInTheGraph = 200;
 
 	static ArrayList<Vehicles> vehicles;
-	static int numMaxVehicles = 4;
+	static int numMaxVehicles = 30;
 
 	static HashMap<Integer, ArrayList<Integer>> reachableUsingDrone;
 	static double maxBatteryConsumption = 500;
-	static int numExtraNodesForDroneInTheGraph = 100;
+	static int numExtraNodesForDroneInTheGraph = 300;
 
 	static ArrayList<Integer> copyNodes;
 	static ArrayList<Integer> copyNodesDrones;
@@ -41,15 +41,16 @@ public class Main {
 		ArrayList<ArrayList<Individual>> F = fast_non_dominated_sort(P);
 		for (int front = 0; front < F.size(); front++) {
 			crowding_distance_assignment(F.get(front));
-//			System.out.println(" in the fronth " + front + " there are " + F.get(front).size());
 		}
 
 		while (numIteration-- > 0) {
-
-			ArrayList<Individual> Q = generateChildren(P);
+			System.out.println("Iter = " + numIteration);
+			ArrayList<Individual> Q = generateChildren(P); // l'errore è qui
 
 			ArrayList<Individual> union = new ArrayList<Individual>(Q);
+
 			union.addAll(P);
+
 			F = fast_non_dominated_sort(union);
 
 			P = updatePopulation(F);
@@ -60,8 +61,8 @@ public class Main {
 		F = fast_non_dominated_sort(P);
 
 		for (int front = 0; front < F.size(); front++) {
-//			System.out.println(" in the fronth " + front + " there are " + F.get(front).size());
-			// System.out.println(F.get(front));
+			System.out.println(" in the fronth " + front + " there are " + F.get(front).size());
+			System.out.println(F.get(front));
 			// //
 //			crowding_distance_assignment(F.get(front));
 		}
@@ -108,14 +109,34 @@ public class Main {
 	private static ArrayList<Individual> generateChildren(ArrayList<Individual> population) {
 		ArrayList<Individual> children = new ArrayList<Individual>();
 
+//		for (Individual i : population)
+//			for (Vehicles v : i.getGenotypeVehicles())
+//				v.checkCapacity();
+
+		System.out.println(population);
 		while (children.size() < populationSize) {
+			System.out.println("children " + children.size());
 			// System.out.println(population.size());
+//			for (Individual i : population) {
+//				System.out.println(i);
+//				for (Vehicles v : i.getGenotypeVehicles())
+//					v.checkCapacity();
+//			}
 			ArrayList<Individual> copy = new ArrayList<Individual>(population);
 
-			Individual first = copy.remove(r.nextInt(copy.size()));
-			Individual second = copy.remove(r.nextInt(copy.size()));
-			Individual third = copy.remove(r.nextInt(copy.size()));
-			Individual fourth = copy.remove(r.nextInt(copy.size()));
+			Individual first = new Individual(copy.remove(r.nextInt(copy.size())).getGenotypeVehicles());
+			Individual second = new Individual(copy.remove(r.nextInt(copy.size())).getGenotypeVehicles());
+			Individual third = new Individual(copy.remove(r.nextInt(copy.size())).getGenotypeVehicles());
+			Individual fourth = new Individual(copy.remove(r.nextInt(copy.size())).getGenotypeVehicles());
+
+//			for (Vehicles v : first.getGenotypeVehicles())
+//				v.checkCapacity();
+//			for (Vehicles v : second.getGenotypeVehicles())
+//				v.checkCapacity();
+//			for (Vehicles v : third.getGenotypeVehicles())
+//				v.checkCapacity();
+//			for (Vehicles v : fourth.getGenotypeVehicles())
+//				v.checkCapacity();
 
 			Individual winning_first = null, winning_second = null;
 
@@ -131,7 +152,13 @@ public class Main {
 			else
 				winning_second = fourth;
 
-			System.out.println("FIRST \n" + winning_first + "\n SECOND \n" + winning_second);
+//			for (Vehicles v : winning_first.getGenotypeVehicles())
+//				v.checkCapacity();
+//
+//			for (Vehicles v : winning_second.getGenotypeVehicles())
+//				v.checkCapacity();
+
+//			System.out.println("FIRST \n" + winning_first + "\n SECOND \n" + winning_second);
 
 			// just because the following crossover operator suppose that the vehicles in
 			// winning_first are more or equal than the ones in winning_second,
@@ -141,6 +168,12 @@ public class Main {
 				winning_first = new Individual(winning_second.getGenotypeVehicles());
 				winning_second = new Individual(toSwap.getGenotypeVehicles());
 			}
+
+//			for (Vehicles v : winning_first.getGenotypeVehicles())
+//				v.checkCapacity();
+//
+//			for (Vehicles v : winning_second.getGenotypeVehicles())
+//				v.checkCapacity();
 
 			int childNumberOfVehicles = (winning_first.getGenotypeVehicles().size()
 					+ winning_second.getGenotypeVehicles().size()) / 2;
@@ -180,25 +213,50 @@ public class Main {
 			Individual firstInd = new Individual(currentIndividualVehiclesFC);
 			Individual secondInd = new Individual(currentIndividualVehiclesSC);
 
-			System.out.println("AFTER CROSSOVER \n FIRST \n" + firstInd + "\n SECOND \n" + secondInd);
+//			for (Vehicles v : firstInd.getGenotypeVehicles())
+//				v.checkCapacity();
+//			for (Vehicles v : secondInd.getGenotypeVehicles())
+//				v.checkCapacity();
+
+//			System.out.println("AFTER CROSSOVER \n FIRST \n" + firstInd + "\n SECOND \n" + secondInd);
 
 			recoverFeasibility(firstInd);
 			recoverFeasibility(secondInd);
 
-			System.out.println("AFTER FEASIBILITY \n FIRST \n" + firstInd + "\n SECOND \n" + secondInd);
+//			for (Vehicles v : firstInd.getGenotypeVehicles())
+//				v.checkCapacity();
+//			for (Vehicles v : secondInd.getGenotypeVehicles())
+//				v.checkCapacity();
+
+//			System.out.println("AFTER FEASIBILITY \n FIRST \n" + firstInd + "\n SECOND \n" + secondInd);
 
 			mutation(firstInd);
 			mutation(secondInd);
 
-			System.out.println("AFTER MUTATION \n FIRST \n" + firstInd + "\n SECOND \n" + secondInd);
+//			for (Vehicles v : firstInd.getGenotypeVehicles())
+//				v.checkCapacity();
+//			for (Vehicles v : secondInd.getGenotypeVehicles())
+//				v.checkCapacity();
+
+//			System.out.println("AFTER MUTATION \n FIRST \n" + firstInd + "\n SECOND \n" + secondInd);
 
 			postOptimize(firstInd);
 			postOptimize(secondInd);
 
-			System.out.println("AFTER OPTIMIZATION \n FIRST \n" + firstInd + "\n SECOND \n" + secondInd);
+//			for (Vehicles v : firstInd.getGenotypeVehicles())
+//				v.checkCapacity();
+//			for (Vehicles v : secondInd.getGenotypeVehicles())
+//				v.checkCapacity();
+
+//			System.out.println("AFTER OPTIMIZATION \n FIRST \n" + firstInd + "\n SECOND \n" + secondInd);
 
 			children.add(firstInd);
 			children.add(secondInd);
+//
+//			for (Vehicles v : firstInd.getGenotypeVehicles())
+//				v.checkCapacity();
+//			for (Vehicles v : secondInd.getGenotypeVehicles())
+//				v.checkCapacity();
 
 		}
 		return children;
@@ -257,7 +315,7 @@ public class Main {
 			Vehicles busiest = s.getGenotypeVehicles().get(s.getGenotypeVehicles().size() - 1);
 			if (busiest.getTour().size() <= 1)
 				break;
-			int toAssign = busiest.getTour().get(1); // prendo l'ultimo veicolo (rotta piu lunga)
+			int toAssign = busiest.getTour().get(1);
 			double droneTour = busiest.getCurrentDroneTourLength().get(toAssign);
 
 //			System.out.println(busiest.getCurrentDroneTourLength());
@@ -381,20 +439,29 @@ public class Main {
 			if (currentProfit - graph.getProfit(extractedRandomNode)
 					- extractedRandomVehicle.getCurrentDroneTourProfit().get(extractedRandomNode) >= minProfitNeeded) {
 				currentProfit -= graph.getProfit(extractedRandomNode);
-				extractedRandomVehicle.getCurrentDroneTourProfit().get(extractedRandomNode);
+				currentProfit -= extractedRandomVehicle.getCurrentDroneTourProfit().get(extractedRandomNode);
 				extractedRandomVehicle.removeNode(extractedRandomNode);
 			}
 		}
 
 		individual.updateSolution(null);
 
+		boolean checked[] = new boolean[numExtraNodesForDroneInTheGraph];
+
 		// add one drone node random
 		for (int i = numNodesInTheGraph; i < numNodesInTheGraph + numExtraNodesForDroneInTheGraph; i++) {
 			if (r.nextDouble() > mutationProb)
 				continue;
 			int extractedRandomNode = copyNodesDrones.get(r.nextInt(copyNodesDrones.size()));
+
+			if (checked[extractedRandomNode - numNodesInTheGraph])
+				continue;
+			else
+				checked[extractedRandomNode - numNodesInTheGraph] = true;
+
 			if (individual.getVisited().contains(extractedRandomNode))
 				continue;
+
 			Vehicles extractedRandomVehicle = individual.getGenotypeVehicles()
 					.get(r.nextInt(individual.getGenotypeVehicles().size()));
 			if (extractedRandomVehicle.getTour().size() <= 1)
@@ -415,35 +482,35 @@ public class Main {
 
 		individual.updateSolution(null);
 
-//		currentProfit = individual.getObjectiveValue()[2];
-//		// remove droneNode with probability mutationProb
-//		for (int i = numNodesInTheGraph; i < numNodesInTheGraph + numExtraNodesForDroneInTheGraph; i++) {
-//			if (r.nextDouble() > mutationProb)
-//				continue;
-//			Vehicles extractedRandomVehicle = individual.getGenotypeVehicles()
-//					.get(r.nextInt(individual.getGenotypeVehicles().size()));
-//
-//			if (extractedRandomVehicle.getTour().size() <= 1)
-//				continue;
-//
-//			int extractedRandomNode = extractedRandomVehicle.getTour()
-//					.get(r.nextInt(extractedRandomVehicle.getTour().size() - 1) + 1);
-//
-//			ArrayList<Integer> droneTourSelected = extractedRandomVehicle.getDroneTour().get(extractedRandomNode);
-//
-//			if (droneTourSelected.size() == 0)
-//				continue;
-//
-//			int extractedDroneNode = droneTourSelected.get(r.nextInt(droneTourSelected.size()));
-//
-//			if (currentProfit - graph.getProfit(extractedDroneNode) >= minProfitNeeded) {
-//				extractedRandomVehicle.removeExtraNode(extractedRandomNode, extractedDroneNode,
-//						graph.getNormalizedDistance(extractedRandomNode, extractedDroneNode),
-//						graph.getProfit(extractedDroneNode));
-//				currentProfit -= graph.getProfit(extractedDroneNode);
-//			}
-//		}
-//		individual.updateSolution(null);
+		currentProfit = individual.getObjectiveValue()[2];
+		// remove droneNode with probability mutationProb
+		for (int i = numNodesInTheGraph; i < numNodesInTheGraph + numExtraNodesForDroneInTheGraph; i++) {
+			if (r.nextDouble() > mutationProb)
+				continue;
+			Vehicles extractedRandomVehicle = individual.getGenotypeVehicles()
+					.get(r.nextInt(individual.getGenotypeVehicles().size()));
+
+			if (extractedRandomVehicle.getTour().size() <= 1)
+				continue;
+
+			int extractedRandomNode = extractedRandomVehicle.getTour()
+					.get(r.nextInt(extractedRandomVehicle.getTour().size() - 1) + 1);
+
+			ArrayList<Integer> droneTourSelected = extractedRandomVehicle.getDroneTour().get(extractedRandomNode);
+
+			if (droneTourSelected.size() == 0)
+				continue;
+
+			int extractedDroneNode = droneTourSelected.get(r.nextInt(droneTourSelected.size()));
+
+			if (currentProfit - graph.getProfit(extractedDroneNode) >= minProfitNeeded) {
+				extractedRandomVehicle.removeExtraNode(extractedRandomNode, extractedDroneNode,
+						graph.getNormalizedDistance(extractedRandomNode, extractedDroneNode),
+						graph.getProfit(extractedDroneNode));
+				currentProfit -= graph.getProfit(extractedDroneNode);
+			}
+		}
+		individual.updateSolution(null);
 
 	}
 
@@ -578,7 +645,7 @@ public class Main {
 			HashMap<Pair, Double> energyConsumed = new HashMap<Pair, Double>();
 
 			// add node for drone for random vehicles and random node as starting point
-			for (int j = 0; j < numExtraNodesForDroneInTheGraph * 2; j++) {
+			for (int j = 0; j < numExtraNodesForDroneInTheGraph; j++) {
 				int randomIndex = r.nextInt(numVehicles); // veicolo scelto random
 				int sizeOfItsPath = vehiclesToUse.get(randomIndex).getTour().size();
 				if (sizeOfItsPath <= 1)
@@ -609,8 +676,10 @@ public class Main {
 				}
 
 			}
+
 			Individual toAdd = new Individual(vehiclesToUse);
 			recoverFeasibility(toAdd);
+
 			toReturn.add(toAdd);
 		}
 
@@ -696,13 +765,11 @@ public class Main {
 		Collections.sort(copyNodes, new Comparator<Integer>() {
 			@Override
 			public int compare(Integer o1, Integer o2) {
-				if ((0.0001 + graph.getProfit(o1))
-						/ (0.0001 + graph.getNeededResource(o1)) > (0.0001 + graph.getProfit(o2))
-								/ (0.0001 + graph.getNeededResource(o2)))
+				if (graph.getProfit(o1) / graph.getNeededResource(o1) > graph.getProfit(o2)
+						/ graph.getNeededResource(o2))
 					return -1;
-				if ((0.0001 + graph.getProfit(o1))
-						/ (0.0001 + graph.getNeededResource(o1)) < (0.0001 + graph.getProfit(o2))
-								/ (0.0001 + graph.getNeededResource(o2)))
+				if (graph.getProfit(o1) / graph.getNeededResource(o1) < graph.getProfit(o2)
+						/ graph.getNeededResource(o2))
 					return 1;
 
 				return 0;
