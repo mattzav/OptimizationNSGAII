@@ -541,8 +541,8 @@ public class Main {
 
 	}
 
+	//consumo in funzione della distanza d
 	public static Double getConsumption(double d) {
-		// TODO Auto-generated method stub
 		return d;
 	}
 
