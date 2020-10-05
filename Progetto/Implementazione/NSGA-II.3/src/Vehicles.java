@@ -159,7 +159,8 @@ public class Vehicles {
 	public void addDronePath(int newNode, ArrayList<Integer> droneTourPath) {
 		// checkCapacity();
 		for (Integer i : droneTourPath)
-			addExtraNode(newNode, i, Main.graph.getNormalizedDistance(newNode, i), Main.graph.getProfit(i));
+			addExtraNode(newNode, i, Main.getConsumption(2 * Main.graph.getNormalizedDistance(newNode, i)),
+					Main.graph.getProfit(i));
 		// checkCapacity();
 
 	}

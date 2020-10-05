@@ -8,20 +8,21 @@ public class Main {
 	static Random r = new Random();
 	static int numObjective = 3;
 	static boolean[] maxOrMinForThatObjective = new boolean[] { true, true, false };
-	static int populationSize = 122 * 2; // numero pari
-	static double minProfitNeeded = 500;
-	static int numIteration = 10;
+	static int populationSize = 2 * 2; // numero pari
+	static double minProfitNeeded = 20000;
+	static int numIteration = 350;
 	static double mutationProb = 0.2;
+	static double crossoverProb = 0.8;
+	static double maxBatteryConsumption = 30;
+	static int numNodesInTheGraph = 4;
+	static int numExtraNodesForDroneInTheGraph = 6;
 
 	static Graph graph;
-	static int numNodesInTheGraph = 100;
 
 	static ArrayList<Vehicles> vehicles;
-	static int numMaxVehicles = 6;
+	static int numMaxVehicles = 3;
 
 	static HashMap<Integer, ArrayList<Integer>> reachableUsingDrone;
-	static double maxBatteryConsumption = 500;
-	static int numExtraNodesForDroneInTheGraph = 300;
 
 	static ArrayList<Integer> copyNodes;
 	static ArrayList<Integer> copyNodesDrones;
@@ -30,7 +31,7 @@ public class Main {
 		copyNodes = new ArrayList<Integer>();
 		reachableUsingDrone = new HashMap<Integer, ArrayList<Integer>>();
 		graph = new Graph(numNodesInTheGraph + numExtraNodesForDroneInTheGraph);
-//		graph.print();
+		graph.print();
 
 		initReachableUsingDrone();// inizializziamo i punti potenzialmente raggiungibili dai droni per ogni nodo
 		createRandomVehicles(); // creiamo i veicoli a disposizione con capacità random
@@ -41,11 +42,12 @@ public class Main {
 		ArrayList<ArrayList<Individual>> F = fast_non_dominated_sort(P);
 		for (int front = 0; front < F.size(); front++) {
 			System.out.println("Nel front " + front + " ci sono " + F.get(front).size() + " soluzioni");
+			// System.out.println(F.get(front));
 			crowding_distance_assignment(F.get(front));
 		}
 
 		while (numIteration-- > 0) {
-			System.out.println("Iter = " + numIteration);
+			// System.out.println("Iter = " + numIteration);
 			ArrayList<Individual> Q = generateChildren(P);
 
 			ArrayList<Individual> union = new ArrayList<Individual>(Q);
@@ -63,10 +65,29 @@ public class Main {
 
 		for (int front = 0; front < F.size(); front++) {
 			System.out.println(" Nel front " + front + " ci sono " + F.get(front).size() + " soluzioni");
-//			System.out.println(F.get(front));
+			System.out.println(F.get(front));
 			// //
 		}
 
+		checkSolution(P);
+
+	}
+
+	private static void checkSolution(ArrayList<Individual> p) {
+		for (Individual ind : p)
+			for (Vehicles v : ind.getGenotypeVehicles())
+				for (Integer node : v.getTour()) {
+					double duration = 0;
+					if (node == 0)
+						continue;
+					for (Integer drone : v.getDroneTour().get(node))
+						duration += getConsumption(2 * graph.getNormalizedDistance(node, drone));
+					if (duration != v.getCurrentDroneTourLength().get(node))
+						throw new RuntimeException("error computing duration");
+					if (duration > maxBatteryConsumption)
+						throw new RuntimeException("error battery consumed");
+
+				}
 	}
 
 	private static ArrayList<Individual> updatePopulation(ArrayList<ArrayList<Individual>> union) {
@@ -474,12 +495,13 @@ public class Main {
 			int extractedRandomNodeForAdding = extractedRandomVehicle.getTour()
 					.get(r.nextInt(extractedRandomVehicle.getTour().size() - 1) + 1);
 			if (extractedRandomVehicle.getCurrentDroneTourLength().get(extractedRandomNodeForAdding)
-					+ graph.getNormalizedDistance(extractedRandomNodeForAdding,
-							extractedRandomNode) <= maxBatteryConsumption
+					+ getConsumption(2 * graph.getNormalizedDistance(extractedRandomNodeForAdding,
+							extractedRandomNode)) <= maxBatteryConsumption
 					&& extractedRandomVehicle.getCurrentCapacity() >= Main.graph
 							.getNeededResource(extractedRandomNode)) {
 				extractedRandomVehicle.addExtraNode(extractedRandomNodeForAdding, extractedRandomNode,
-						graph.getNormalizedDistance(extractedRandomNodeForAdding, extractedRandomNode),
+						getConsumption(
+								2 * graph.getNormalizedDistance(extractedRandomNodeForAdding, extractedRandomNode)),
 						graph.getProfit(extractedRandomNode));
 			}
 
@@ -510,13 +532,18 @@ public class Main {
 
 			if (currentProfit - graph.getProfit(extractedDroneNode) >= minProfitNeeded) {
 				extractedRandomVehicle.removeExtraNode(extractedRandomNode, extractedDroneNode,
-						graph.getNormalizedDistance(extractedRandomNode, extractedDroneNode),
+						getConsumption(2 * graph.getNormalizedDistance(extractedRandomNode, extractedDroneNode)),
 						graph.getProfit(extractedDroneNode));
 				currentProfit -= graph.getProfit(extractedDroneNode);
 			}
 		}
 		individual.updateSolution(null);
 
+	}
+
+	public static Double getConsumption(double d) {
+		// TODO Auto-generated method stub
+		return d;
 	}
 
 	private static void crowding_distance_assignment(ArrayList<Individual> front_i_th) {
@@ -638,7 +665,7 @@ public class Main {
 			while (!nodesInTheGraph.isEmpty()) {
 				int selectedNode = nodesInTheGraph.remove(r.nextInt(nodesInTheGraph.size()));
 
-				if (r.nextDouble() <= 0.8) {
+				if (r.nextDouble() <= crossoverProb) {
 					int selectedVehicles = r.nextInt(numVehicles);
 					if (vehiclesToUse.get(selectedVehicles).getCurrentCapacity() >= graph
 							.getNeededResource(selectedNode)) {
@@ -668,16 +695,17 @@ public class Main {
 				// scegliamo un indice di partenza random e usiamo il modulo per scorrere in
 				// modo ciclico la lista (da i a n e da 0 a i-1)
 
-				if (graph.getNormalizedDistance(nodeRandom, destination)
+				if (getConsumption(2 * graph.getNormalizedDistance(nodeRandom, destination))
 						+ energyConsumed.get(new Pair(randomIndex, nodeRandom)) <= maxBatteryConsumption
 						&& nodesForTheDrones.contains(destination) && vehiclesToUse.get(randomIndex)
 								.getCurrentCapacity() >= graph.getNeededResource(destination)) {
 					nodesForTheDrones.remove(Integer.valueOf(destination));
 					vehiclesToUse.get(randomIndex).addExtraNode(nodeRandom, destination,
-							graph.getNormalizedDistance(nodeRandom, destination), graph.getProfit(destination));
+							getConsumption(2 * graph.getNormalizedDistance(nodeRandom, destination)),
+							graph.getProfit(destination));
 					energyConsumed.replace(new Pair(randomIndex, nodeRandom),
 							energyConsumed.get(new Pair(randomIndex, nodeRandom))
-									+ graph.getNormalizedDistance(nodeRandom, destination));
+									+ getConsumption(2 * graph.getNormalizedDistance(nodeRandom, destination)));
 				}
 
 			}
@@ -747,10 +775,10 @@ public class Main {
 					if (nodeForAdding == 0)
 						continue;
 					if (vehicle.getCurrentDroneTourLength().get(nodeForAdding)
-							+ graph.getNormalizedDistance(nodeForAdding, i) <= maxBatteryConsumption
+							+ getConsumption(2 * graph.getNormalizedDistance(nodeForAdding, i)) <= maxBatteryConsumption
 							&& vehicle.getCurrentCapacity() >= Main.graph.getNeededResource(i)) {
-						vehicle.addExtraNode(nodeForAdding, i, graph.getNormalizedDistance(nodeForAdding, i),
-								graph.getProfit(i));
+						vehicle.addExtraNode(nodeForAdding, i,
+								getConsumption(2 * graph.getNormalizedDistance(nodeForAdding, i)), graph.getProfit(i));
 						inserted = true;
 						added += Main.graph.getProfit(i);
 						break;
@@ -799,7 +827,7 @@ public class Main {
 		for (int i = 0; i < numNodesInTheGraph; i++) {
 			reachableUsingDrone.put(i, new ArrayList<Integer>());
 			for (int j = numNodesInTheGraph; j < numNodesInTheGraph + numExtraNodesForDroneInTheGraph; j++) {
-				if (graph.getNormalizedDistance(i, j) <= maxBatteryConsumption) {
+				if (getConsumption(2 * graph.getNormalizedDistance(i, j)) <= maxBatteryConsumption) {
 					reachableUsingDrone.get(i).add(j);
 				}
 			}
