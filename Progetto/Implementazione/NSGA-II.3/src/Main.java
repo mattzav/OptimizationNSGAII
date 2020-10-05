@@ -8,16 +8,16 @@ public class Main {
 	static Random r = new Random();
 	static int numObjective = 3;
 	static boolean[] maxOrMinForThatObjective = new boolean[] { true, true, false };
-	static int populationSize = 2 * 2; // numero pari
+	static int populationSize = 122 * 2; // numero pari
 	static double minProfitNeeded = 500;
-	static int numIteration = 2000;
+	static int numIteration = 10;
 	static double mutationProb = 0.2;
 
 	static Graph graph;
-	static int numNodesInTheGraph = 200;
+	static int numNodesInTheGraph = 100;
 
 	static ArrayList<Vehicles> vehicles;
-	static int numMaxVehicles = 30;
+	static int numMaxVehicles = 6;
 
 	static HashMap<Integer, ArrayList<Integer>> reachableUsingDrone;
 	static double maxBatteryConsumption = 500;
@@ -30,7 +30,7 @@ public class Main {
 		copyNodes = new ArrayList<Integer>();
 		reachableUsingDrone = new HashMap<Integer, ArrayList<Integer>>();
 		graph = new Graph(numNodesInTheGraph + numExtraNodesForDroneInTheGraph);
-		graph.print();
+//		graph.print();
 
 		initReachableUsingDrone();// inizializziamo i punti potenzialmente raggiungibili dai droni per ogni nodo
 		createRandomVehicles(); // creiamo i veicoli a disposizione con capacità random
@@ -40,12 +40,13 @@ public class Main {
 
 		ArrayList<ArrayList<Individual>> F = fast_non_dominated_sort(P);
 		for (int front = 0; front < F.size(); front++) {
+			System.out.println("Nel front " + front + " ci sono " + F.get(front).size() + " soluzioni");
 			crowding_distance_assignment(F.get(front));
 		}
 
 		while (numIteration-- > 0) {
 			System.out.println("Iter = " + numIteration);
-			ArrayList<Individual> Q = generateChildren(P); // l'errore è qui
+			ArrayList<Individual> Q = generateChildren(P);
 
 			ArrayList<Individual> union = new ArrayList<Individual>(Q);
 
@@ -61,10 +62,9 @@ public class Main {
 		F = fast_non_dominated_sort(P);
 
 		for (int front = 0; front < F.size(); front++) {
-			System.out.println(" in the fronth " + front + " there are " + F.get(front).size());
-			System.out.println(F.get(front));
+			System.out.println(" Nel front " + front + " ci sono " + F.get(front).size() + " soluzioni");
+//			System.out.println(F.get(front));
 			// //
-//			crowding_distance_assignment(F.get(front));
 		}
 
 	}
@@ -113,9 +113,9 @@ public class Main {
 //			for (Vehicles v : i.getGenotypeVehicles())
 //				v.checkCapacity();
 
-		System.out.println(population);
+		// System.out.println(population);
 		while (children.size() < populationSize) {
-			System.out.println("children " + children.size());
+
 			// System.out.println(population.size());
 //			for (Individual i : population) {
 //				System.out.println(i);
@@ -158,7 +158,8 @@ public class Main {
 //			for (Vehicles v : winning_second.getGenotypeVehicles())
 //				v.checkCapacity();
 
-//			System.out.println("FIRST \n" + winning_first + "\n SECOND \n" + winning_second);
+			// System.out.println("FIRST \n" + winning_first + "\n SECOND \n" +
+			// winning_second);
 
 			// just because the following crossover operator suppose that the vehicles in
 			// winning_first are more or equal than the ones in winning_second,
@@ -218,7 +219,8 @@ public class Main {
 //			for (Vehicles v : secondInd.getGenotypeVehicles())
 //				v.checkCapacity();
 
-//			System.out.println("AFTER CROSSOVER \n FIRST \n" + firstInd + "\n SECOND \n" + secondInd);
+			// System.out.println("AFTER CROSSOVER \n FIRST \n" + firstInd + "\n SECOND \n"
+			// + secondInd);
 
 			recoverFeasibility(firstInd);
 			recoverFeasibility(secondInd);
@@ -228,7 +230,8 @@ public class Main {
 //			for (Vehicles v : secondInd.getGenotypeVehicles())
 //				v.checkCapacity();
 
-//			System.out.println("AFTER FEASIBILITY \n FIRST \n" + firstInd + "\n SECOND \n" + secondInd);
+			// System.out.println("AFTER FEASIBILITY \n FIRST \n" + firstInd + "\n SECOND
+			// \n" + secondInd);
 
 			mutation(firstInd);
 			mutation(secondInd);
@@ -238,7 +241,8 @@ public class Main {
 //			for (Vehicles v : secondInd.getGenotypeVehicles())
 //				v.checkCapacity();
 
-//			System.out.println("AFTER MUTATION \n FIRST \n" + firstInd + "\n SECOND \n" + secondInd);
+			// System.out.println("AFTER MUTATION \n FIRST \n" + firstInd + "\n SECOND \n" +
+			// secondInd);
 
 			postOptimize(firstInd);
 			postOptimize(secondInd);
@@ -248,7 +252,8 @@ public class Main {
 //			for (Vehicles v : secondInd.getGenotypeVehicles())
 //				v.checkCapacity();
 
-//			System.out.println("AFTER OPTIMIZATION \n FIRST \n" + firstInd + "\n SECOND \n" + secondInd);
+			// System.out.println("AFTER OPTIMIZATION \n FIRST \n" + firstInd + "\n SECOND
+			// \n" + secondInd);
 
 			children.add(firstInd);
 			children.add(secondInd);
@@ -782,9 +787,9 @@ public class Main {
 		for (int i = 0; i < numMaxVehicles; i++) {
 			boolean capacity = r.nextBoolean();
 			if (capacity)
-				vehicles.add(new Vehicles(100));
+				vehicles.add(new Vehicles(1000));
 			else
-				vehicles.add(new Vehicles(200));
+				vehicles.add(new Vehicles(2000));
 		}
 	}
 
