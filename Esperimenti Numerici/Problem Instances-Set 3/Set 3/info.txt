@@ -1,0 +1,9 @@
+There are fifteen problem instances: five instances for each Area.
+
+For each problem instance, there are two files:
+
+1- File “Ax_y_Dist_Matrix.csv” gives the real distance between each pair of nodes in kilometers. x denotes area number and y denotes the instance number for that area.
+2- File “Ax_y_Lat_Long.csv” gives the latitude and longitude of each demand location (and depot) for problem instance y in Area x.
+
+To obtain travel times, one can divide distance by the vehicle speed.
+The first node in all files represent the depot

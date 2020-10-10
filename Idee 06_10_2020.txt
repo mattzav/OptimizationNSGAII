@@ -1,0 +1,3 @@
+Inserire più droni
+Ricarica drone in funzione della distanza percorsa
+Consumo drone funzione lineare / non lineare

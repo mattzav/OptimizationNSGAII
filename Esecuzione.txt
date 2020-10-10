@@ -1,0 +1,45 @@
+
+Per ogni nodo del grafo originale, mi salvo quelli potenzialmente raggiungibili (la distanza non mi consuma tutta la batteria)
+Creo il Grafo random
+Creo i veicoli con capacità random (100,250)
+
+INIT POPULATION
+	Per ogni individuo
+		Scelgo random il numero dei veicoli e i veicoli da usare
+		Per ogni nodo nel grafo originale
+			Con probabilità p
+				Scelgo un veicolo random che abbia capacità sufficiente e aggiungo quel nodo alla sua lista
+		
+		Eseguo n iterazioni, dove n è pari al numero di nodi nel grafo dei droni
+			Scelgo un veicolo random, scelgo un nodo random del suo percorso e scelgo un nodo che potenzialmente potrebbe raggiungere tramite drone
+				Se è effettivamente raggiungibile in base al tour corrente partendo da quel nodo ed ha la capacità necessaria, allora lo aggiungo
+		RECOVER FEASIBILITY
+			Ordino i veicoli in base alla lunghezza del tour
+			Se il profitto attuale è minore del profitto minimo (serve per evitare soluzioni vuote non dominate)
+				Aggiungo i nodi ai veicoli con lunghezza del tour minore
+			Se il profitto attuale è minore del profitto minimo
+				Provo ad aggiungere nodi per i droni in modo random
+
+
+FAST-NON-DOMINATED-SORT (ordina in fronti)
+CROWDING_DISTANCE (all'interno di ogni front)
+
+while(numIteration-- >0)
+	Q = GENERATECHILDREN
+		Scelgo 4 individui random e ne seleziono i due vincitori in base a front e crowdingDistance
+		Genero due figli con numVeicoli pari alla media e con veicoli misti tra i due genitori (CrossOver)	
+		RecoverFeasibility
+		Mutation
+			Con probabilità p
+				Inverto due nodi in un data veicolo
+				Aggiungo un nodo
+				Rimuovo un nodo
+				Aggiungo un nodo per droni
+				-----manca rimuovo nodo per droni---
+		PostOptimize
+			Se un nodo è visitato più di una volta da veicoli della stessa soluzione, lo lascio solo nel veicolo con rotta per i droni più lunga 
+			Ordino i veicoli in base alla durata del tour
+				Itero assegnando un nodo del veicolo con tour più lungo al veicolo con tour piu breve, in modo da bilanciare tutte le durate dei tour
+	union = q union p
+	fast-non-dominated-sord(union)
+	UPDATEPOPULATION(union)		

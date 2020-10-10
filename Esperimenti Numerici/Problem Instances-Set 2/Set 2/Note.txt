@@ -1,0 +1,8 @@
+There are instances for Set 2(a) from Salehipour et al (2011) and Set 2(b) from Tuzun and Burke (1999) and also from Prins et al (2006).
+
+The order of the files are the same as the order of the instances appearing in the tables in the paper.
+
+Files contain the coordinates of each demand location (and depot) for problem instance Y in problem setup X.
+The first and last coordinates represent the depot location.
+
+There are also files that contain the flight range limits of the drones. These ranges have been calculated for 25% and 50% coverage percentages. For example for instances from Prins  et al. (2006) with 50 customers “Flight_25_Percent50.txt” means 25% coverage percentage. 50 denotes the number of customers.
