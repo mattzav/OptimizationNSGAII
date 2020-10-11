@@ -43,7 +43,8 @@ public class Individual {
 			visited.addAll(genotypeVehicles.get(j).getTour());
 			for (Integer node : genotypeVehicles.get(j).getTour()) {
 				if (node != 0) {
-					visited.addAll(genotypeVehicles.get(j).getDroneTour().get(node));
+					for (int drone = 0; drone < Main.numDronesPerVehicle; drone++)
+						visited.addAll(genotypeVehicles.get(j).getDroneTour().get(node).get(drone));
 				}
 			}
 		}
