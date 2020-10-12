@@ -8,6 +8,7 @@ public class Vehicles {
 	private ArrayList<Integer> tour;
 
 	private HashMap<Integer, HashMap<Integer, ArrayList<Integer>>> droneTour;
+	private HashMap<Integer, Double> longestDroneTourForNode;
 	private HashMap<Integer, HashMap<Integer, Double>> currentDroneTourLength;
 	private HashMap<Integer, HashMap<Integer, Double>> currentDroneTourProfit;
 
@@ -20,6 +21,7 @@ public class Vehicles {
 		this.tour.add(0);
 
 		this.droneTour = new HashMap<Integer, HashMap<Integer, ArrayList<Integer>>>();
+		this.longestDroneTourForNode = new HashMap<Integer, Double>();
 		this.currentDroneTourLength = new HashMap<Integer, HashMap<Integer, Double>>();
 		this.currentDroneTourProfit = new HashMap<Integer, HashMap<Integer, Double>>();
 		// checkCapacity();
@@ -44,6 +46,11 @@ public class Vehicles {
 			}
 		}
 
+		this.longestDroneTourForNode = new HashMap<Integer, Double>();
+		for (Integer keynode : v.getLongestDroneTourForNode().keySet()) {
+			longestDroneTourForNode.put(keynode, v.getLongestDroneTourForNode().get(keynode));
+		}
+
 		this.currentDroneTourLength = new HashMap<Integer, HashMap<Integer, Double>>();
 		for (Integer keynode : v.getCurrentDroneTourLength().keySet()) {
 			currentDroneTourLength.put(keynode, new HashMap<Integer, Double>());
@@ -60,6 +67,7 @@ public class Vehicles {
 						v.getCurrentDroneTourProfit().get(keynode).get(keydrone));
 			}
 		}
+
 		// checkCapacity();
 	}
 
@@ -103,6 +111,10 @@ public class Vehicles {
 		this.droneTour = droneTour;
 	}
 
+	public HashMap<Integer, Double> getLongestDroneTourForNode() {
+		return longestDroneTourForNode;
+	}
+
 	public HashMap<Integer, HashMap<Integer, Double>> getCurrentDroneTourLength() {
 		return currentDroneTourLength;
 	}
@@ -127,7 +139,14 @@ public class Vehicles {
 		tour.add(selectedNode);
 
 		droneTour.put(selectedNode, new HashMap<Integer, ArrayList<Integer>>());
+		longestDroneTourForNode.put(selectedNode, 0.);
 		for (int i = 0; i < Main.numDronesPerVehicle; i++) {
+			if (currentDroneTourLength.get(selectedNode) == null)
+				currentDroneTourLength.put(selectedNode, new HashMap<Integer, Double>());
+
+			if (currentDroneTourProfit.get(selectedNode) == null)
+				currentDroneTourProfit.put(selectedNode, new HashMap<Integer, Double>());
+
 			currentDroneTourLength.get(selectedNode).put(i, 0.);
 			currentDroneTourProfit.get(selectedNode).put(i, 0.);
 		}
@@ -156,16 +175,23 @@ public class Vehicles {
 	public void addExtraNode(Integer startingNode, int selectedNode, int selectedDrone, double normalizedDistance,
 			double profit) {
 		// checkCapacity();
-		tourLength += normalizedDistance;
 
 		currentCapacity -= Main.graph.getNeededResource(selectedNode);
 //
 //		if (droneTour.get(startingNode).contains(selectedNode))
 //			throw new RuntimeException("errore");
 
+		if (droneTour.get(startingNode).get(selectedDrone) == null)
+			droneTour.get(startingNode).put(selectedDrone, new ArrayList<Integer>());
 		droneTour.get(startingNode).get(selectedDrone).add(selectedNode);
-		currentDroneTourLength.get(startingNode).replace(selectedDrone,
-				currentDroneTourLength.get(startingNode).get(selectedDrone) + normalizedDistance);
+
+		double newLength = currentDroneTourLength.get(startingNode).get(selectedDrone) + normalizedDistance;
+		currentDroneTourLength.get(startingNode).replace(selectedDrone, newLength);
+		if (newLength > longestDroneTourForNode.get(startingNode)) {
+			longestDroneTourForNode.replace(startingNode, newLength);
+			tourLength += normalizedDistance;
+		}
+
 		currentDroneTourProfit.get(startingNode).replace(selectedDrone,
 				currentDroneTourProfit.get(startingNode).get(selectedDrone) + profit);
 		// checkCapacity();
@@ -174,9 +200,10 @@ public class Vehicles {
 
 	public void addDronePath(int node, int drone, ArrayList<Integer> droneTourPath) {
 		// checkCapacity();
-		for (Integer i : droneTourPath)
-			addExtraNode(node, i, drone, Main.getConsumption(2 * Main.graph.getNormalizedDistance(node, i)),
-					Main.graph.getProfit(i));
+		if (droneTourPath != null)
+			for (Integer i : droneTourPath)
+				addExtraNode(node, i, drone, Main.getConsumption(2 * Main.graph.getNormalizedDistance(node, i)),
+						Main.graph.getProfit(i));
 		// checkCapacity();
 
 	}
@@ -256,8 +283,9 @@ public class Vehicles {
 
 		currentCapacity += Main.graph.getNeededResource(i);
 		for (int k = 0; k < Main.numDronesPerVehicle; k++)
-			for (Integer visited : droneTour.get(i).get(k))
-				currentCapacity += Main.graph.getNeededResource(visited);
+			if (droneTour.get(i).get(k) != null)
+				for (Integer visited : droneTour.get(i).get(k))
+					currentCapacity += Main.graph.getNeededResource(visited);
 
 		tour.remove(tour.indexOf(i));
 
@@ -267,6 +295,7 @@ public class Vehicles {
 		// non
 		// ci sarà più
 
+		longestDroneTourForNode.remove(i);
 		currentDroneTourLength.remove(i);
 		currentDroneTourProfit.remove(i);
 		droneTour.remove(i);
@@ -280,7 +309,18 @@ public class Vehicles {
 		tourLength -= normalizedDuration;
 
 		droneTour.get(k).get(drone).remove(Integer.valueOf(selectedNode));
-		currentDroneTourLength.get(k).replace(drone, currentDroneTourLength.get(k).get(drone) - normalizedDuration);
+
+		if (longestDroneTourForNode.get(k) == currentDroneTourLength.get(k).get(drone) && normalizedDuration != 0) {
+			currentDroneTourLength.get(k).replace(drone, currentDroneTourLength.get(k).get(drone) - normalizedDuration);
+
+			double maxTourLength = 0.;
+			for (int drone_id = 0; drone_id < Main.numDronesPerVehicle; drone_id++)
+				if (currentDroneTourLength.get(k).get(drone_id) > maxTourLength)
+					maxTourLength = currentDroneTourLength.get(k).get(drone_id);
+			longestDroneTourForNode.replace(k, maxTourLength);
+		} else {
+			currentDroneTourLength.get(k).replace(drone, currentDroneTourLength.get(k).get(drone) - normalizedDuration);
+		}
 		currentDroneTourProfit.get(k).replace(drone, currentDroneTourProfit.get(k).get(drone) - profit);
 
 		// checkCapacity();

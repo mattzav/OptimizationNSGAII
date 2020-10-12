@@ -9,13 +9,13 @@ public class Main {
 	static int numObjective = 3;
 	static boolean[] maxOrMinForThatObjective = new boolean[] { true, true, false };
 	static int populationSize = 2 * 2; // numero pari
-	static double minProfitNeeded = 20000;
-	static int numIteration = 350;
+	static double minProfitNeeded = 2000;
+	static int numIteration = 30;
 	static double mutationProb = 0.2;
 	static double crossoverProb = 0.8;
-	static double maxBatteryConsumption = 30;
-	static int numNodesInTheGraph = 4;
-	static int numExtraNodesForDroneInTheGraph = 6;
+	static double maxBatteryConsumption = 100;
+	static int numNodesInTheGraph = 10;
+	static int numExtraNodesForDroneInTheGraph = 20;
 
 	static int numDronesPerVehicle = 3;
 
@@ -83,8 +83,9 @@ public class Main {
 						double duration = 0;
 						if (node == 0)
 							continue;
-						for (Integer drone : v.getDroneTour().get(node).get(i))
-							duration += getConsumption(2 * graph.getNormalizedDistance(node, drone));
+						if (v.getDroneTour().get(node).get(i) != null)
+							for (Integer drone : v.getDroneTour().get(node).get(i))
+								duration += getConsumption(2 * graph.getNormalizedDistance(node, drone));
 						if (duration != v.getCurrentDroneTourLength().get(node).get(i))
 							throw new RuntimeException("error computing duration");
 						if (duration > maxBatteryConsumption)
@@ -347,14 +348,16 @@ public class Main {
 			Vehicles busiest = s.getGenotypeVehicles().get(s.getGenotypeVehicles().size() - 1);
 			if (busiest.getTour().size() <= 1)
 				break;
-			int toAssign = busiest.getTour().get(1);
-			double droneTour = busiest.getCurrentDroneTourLength().get(toAssign);
+			int toAssign = busiest.getTour().get(1); // si potrebbe fare un for per ogni toAssing
+			double droneTour = busiest.getLongestDroneTourForNode().get(toAssign);
 
 //			System.out.println(busiest.getCurrentDroneTourLength());
-			ArrayList<Integer> droneTourPath = busiest.getDroneTour().get(toAssign);
+			HashMap<Integer, ArrayList<Integer>> droneTourPath = busiest.getDroneTour().get(toAssign);
 			double resourceNeeded = 0;
-			for (Integer i : droneTourPath)
-				resourceNeeded += graph.getNeededResource(i);
+			for (int drone = 0; drone < numDronesPerVehicle; drone++)
+				if (droneTourPath.get(drone) != null)
+					for (Integer i : droneTourPath.get(drone))
+						resourceNeeded += graph.getNeededResource(i);
 
 			for (int index = 0; index < s.getGenotypeVehicles().size() - 1; index++) {
 				Vehicles v = s.getGenotypeVehicles().get(index);
@@ -372,7 +375,8 @@ public class Main {
 //					System.out.println("I'M ADDING " + toAssign + " in " + v);
 
 					v.addNode(toAssign);
-					v.addDronePath(toAssign, droneTourPath);
+					for (int drone = 0; drone < numDronesPerVehicle; drone++)
+						v.addDronePath(toAssign, drone, droneTourPath.get(drone));
 //					System.out.println("obtaining " + toAssign + " in " + v);
 					busiest.removeNode(toAssign);
 					found = true;
@@ -539,7 +543,7 @@ public class Main {
 			ArrayList<Integer> droneTourSelected = extractedRandomVehicle.getDroneTour().get(extractedRandomNode)
 					.get(extractedRandomDrone);
 
-			if (droneTourSelected.size() == 0)
+			if (droneTourSelected == null || droneTourSelected.size() == 0)
 				continue;
 
 			int extractedDroneNode = droneTourSelected.get(r.nextInt(droneTourSelected.size()));
@@ -801,7 +805,7 @@ public class Main {
 								+ getConsumption(
 										2 * graph.getNormalizedDistance(nodeForAdding, i)) <= maxBatteryConsumption
 								&& vehicle.getCurrentCapacity() >= Main.graph.getNeededResource(i)) {
-							vehicle.addExtraNode(nodeForAdding, i, index%numDronesPerVehicle,
+							vehicle.addExtraNode(nodeForAdding, i, index % numDronesPerVehicle,
 									getConsumption(2 * graph.getNormalizedDistance(nodeForAdding, i)),
 									graph.getProfit(i));
 							inserted = true;

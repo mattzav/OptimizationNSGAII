@@ -335,7 +335,7 @@ public class Main {
 
 		boolean found = true;
 		while (found) {
-//			System.out.println("UPDATED \n " + s.getGenotypeVehicles());
+			System.out.println("UPDATED \n " + s.getGenotypeVehicles());
 			found = false;
 			// controllare che il tour non sia vuoto
 			Vehicles busiest = s.getGenotypeVehicles().get(s.getGenotypeVehicles().size() - 1);
@@ -361,9 +361,9 @@ public class Main {
 					if (avoidLoop.getTourLength() >= busiest.getTourLength())
 						continue;
 
-//					System.out.println("freest " + v);
-//					System.out.println("busiest " + busiest);
-//					System.out.println("I'M ADDING " + toAssign + " in " + v);
+					System.out.println("freest " + v);
+					System.out.println("busiest " + busiest);
+					System.out.println("I'M ADDING " + toAssign + " in " + v);
 
 					v.addNode(toAssign);
 					v.addDronePath(toAssign, droneTourPath);
@@ -411,7 +411,7 @@ public class Main {
 			}
 		}
 
-//		System.out.println("AFTER \n" + s.getGenotypeVehicles() + "\n END");
+		System.out.println("AFTER \n" + s.getGenotypeVehicles() + "\n END");
 		s.updateSolution(null);
 
 	}
@@ -541,7 +541,7 @@ public class Main {
 
 	}
 
-	//consumo in funzione della distanza d
+	// consumo in funzione della distanza d
 	public static Double getConsumption(double d) {
 		return d;
 	}
