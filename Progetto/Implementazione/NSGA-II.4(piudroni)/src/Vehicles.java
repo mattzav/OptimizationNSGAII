@@ -7,6 +7,7 @@ public class Vehicles {
 	private double tourLength;
 	private ArrayList<Integer> tour;
 
+	// se il numero di droni è fissato, si puo usare array list
 	private HashMap<Integer, HashMap<Integer, ArrayList<Integer>>> droneTour;
 	private HashMap<Integer, Double> longestDroneTourForNode;
 	private HashMap<Integer, HashMap<Integer, Double>> currentDroneTourLength;
@@ -188,8 +189,8 @@ public class Vehicles {
 		double newLength = currentDroneTourLength.get(startingNode).get(selectedDrone) + normalizedDistance;
 		currentDroneTourLength.get(startingNode).replace(selectedDrone, newLength);
 		if (newLength > longestDroneTourForNode.get(startingNode)) {
+			tourLength += (newLength - longestDroneTourForNode.get(startingNode));
 			longestDroneTourForNode.replace(startingNode, newLength);
-			tourLength += normalizedDistance;
 		}
 
 		currentDroneTourProfit.get(startingNode).replace(selectedDrone,
@@ -210,8 +211,15 @@ public class Vehicles {
 
 	@Override
 	public String toString() {
-		return "\n (" + capacity + "," + currentCapacity + ")" + tour + " LENGTH:" + tourLength + " \n Drone Tour:"
-				+ droneTour;
+		String toAdd = "";
+		for (Integer node : droneTour.keySet()) {
+			toAdd += "  Node: " + node + ", Max Drone Tour: " + longestDroneTourForNode.get(node) + " \n";
+			for (Integer droneNode : droneTour.get(node).keySet())
+				toAdd += "   Drone: " + droneNode + ", Tour: " + droneTour.get(node).get(droneNode) + " Length: "
+						+ currentDroneTourLength.get(node).get(droneNode) + "\n";
+		}
+		return "\n (" + capacity + "," + currentCapacity + ")" + tour + " LENGTH:" + tourLength + " \n Drone Tour: \n"
+				+ toAdd;
 	}
 
 	public void swap(int i, int j) {
@@ -289,11 +297,8 @@ public class Vehicles {
 
 		tour.remove(tour.indexOf(i));
 
-		for (int k = 0; k < Main.numDronesPerVehicle; k++)
-			tourLength -= currentDroneTourLength.get(i).get(k); // rimuovo la durata del tour del drone in quel nodo
-																// dato che
-		// non
-		// ci sarà più
+		tourLength -= longestDroneTourForNode.get(i);// rimuovo la durata del tour del drone piu impegnato
+
 
 		longestDroneTourForNode.remove(i);
 		currentDroneTourLength.remove(i);
@@ -306,17 +311,18 @@ public class Vehicles {
 	public void removeExtraNode(Integer k, int drone, int selectedNode, double normalizedDuration, double profit) {
 		// checkCapacity();
 		currentCapacity += Main.graph.getNeededResource(selectedNode);
-		tourLength -= normalizedDuration;
 
 		droneTour.get(k).get(drone).remove(Integer.valueOf(selectedNode));
 
 		if (longestDroneTourForNode.get(k) == currentDroneTourLength.get(k).get(drone) && normalizedDuration != 0) {
+
 			currentDroneTourLength.get(k).replace(drone, currentDroneTourLength.get(k).get(drone) - normalizedDuration);
 
 			double maxTourLength = 0.;
 			for (int drone_id = 0; drone_id < Main.numDronesPerVehicle; drone_id++)
 				if (currentDroneTourLength.get(k).get(drone_id) > maxTourLength)
 					maxTourLength = currentDroneTourLength.get(k).get(drone_id);
+			tourLength -= (longestDroneTourForNode.get(k) - maxTourLength);
 			longestDroneTourForNode.replace(k, maxTourLength);
 		} else {
 			currentDroneTourLength.get(k).replace(drone, currentDroneTourLength.get(k).get(drone) - normalizedDuration);

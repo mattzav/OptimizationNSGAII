@@ -4,25 +4,27 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Random;
 
+import javax.management.RuntimeErrorException;
+
 public class Main {
 	static Random r = new Random();
 	static int numObjective = 3;
 	static boolean[] maxOrMinForThatObjective = new boolean[] { true, true, false };
-	static int populationSize = 2 * 2; // numero pari
+	static int populationSize = 6 * 2; // numero pari
 	static double minProfitNeeded = 2000;
-	static int numIteration = 30;
+	static int numIteration = 300;
 	static double mutationProb = 0.2;
 	static double crossoverProb = 0.8;
-	static double maxBatteryConsumption = 100;
+	static double maxBatteryConsumption = 10000;
 	static int numNodesInTheGraph = 10;
-	static int numExtraNodesForDroneInTheGraph = 20;
+	static int numExtraNodesForDroneInTheGraph = 100;
 
-	static int numDronesPerVehicle = 3;
+	static int numDronesPerVehicle = 10;
 
 	static Graph graph;
 
 	static ArrayList<Vehicles> vehicles;
-	static int numMaxVehicles = 3;
+	static int numMaxVehicles = 5;
 
 	static HashMap<Integer, ArrayList<Integer>> reachableUsingDrone;
 
@@ -39,17 +41,19 @@ public class Main {
 		createRandomVehicles(); // creiamo i veicoli a disposizione con capacità random
 
 		ArrayList<Individual> P = initPopulation();
-//		System.out.println(P);
+		// System.out.println(P);
 
 		ArrayList<ArrayList<Individual>> F = fast_non_dominated_sort(P);
 		for (int front = 0; front < F.size(); front++) {
-			System.out.println("Nel front " + front + " ci sono " + F.get(front).size() + " soluzioni");
-			// System.out.println(F.get(front));
+//			System.out.println("Nel front " + front + " ci sono " + F.get(front).size() + " soluzioni"); //
+//			System.out.println(F.get(front));
 			crowding_distance_assignment(F.get(front));
 		}
 
 		while (numIteration-- > 0) {
-			// System.out.println("Iter = " + numIteration);
+			if (numIteration % 100 == 0)
+				System.out.println("Iter = " + numIteration);
+
 			ArrayList<Individual> Q = generateChildren(P);
 
 			ArrayList<Individual> union = new ArrayList<Individual>(Q);
@@ -68,7 +72,6 @@ public class Main {
 		for (int front = 0; front < F.size(); front++) {
 			System.out.println(" Nel front " + front + " ci sono " + F.get(front).size() + " soluzioni");
 			System.out.println(F.get(front));
-			// //
 		}
 
 		checkSolution(P);
@@ -790,6 +793,21 @@ public class Main {
 
 			if (toAdd.getVisited().contains(i))
 				continue;
+			else {
+				// debug
+				for (int a = 0; a < toAdd.getGenotypeVehicles().size(); a++)
+					for (Integer b : toAdd.getGenotypeVehicles().get(a).getTour())
+						for (int d = 0; d < numDronesPerVehicle; d++) {
+							HashMap<Integer, ArrayList<Integer>> check = toAdd.getGenotypeVehicles().get(a)
+									.getDroneTour().get(b);
+							if (check != null) {
+								ArrayList<Integer> checkb = check.get(d);
+								if (checkb != null && checkb.contains(i))
+									throw new RuntimeException("errore");
+							}
+						}
+				// end debug
+			}
 			boolean inserted = false;
 			int startingrandom = r.nextInt(toAdd.getGenotypeVehicles().size());
 			for (int j = startingrandom; j < startingrandom + toAdd.getGenotypeVehicles().size() && !inserted; j++) {
@@ -812,6 +830,8 @@ public class Main {
 							added += Main.graph.getProfit(i);
 							break;
 						}
+					if (inserted)
+						break;
 				}
 			}
 		}
