@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Vehicles {
+public class Vehicle {
 	private int capacity;
 	private int currentCapacity;
 	private double tourLength;
@@ -13,7 +13,7 @@ public class Vehicles {
 	private HashMap<Integer, HashMap<Integer, Double>> currentDroneTourLength;
 	private HashMap<Integer, HashMap<Integer, Double>> currentDroneTourProfit;
 
-	public Vehicles(int capacity) {
+	public Vehicle(int capacity) {
 		this.capacity = capacity;
 		this.currentCapacity = capacity;
 		this.tourLength = 0;
@@ -29,7 +29,7 @@ public class Vehicles {
 
 	}
 
-	public Vehicles(Vehicles v) {
+	public Vehicle(Vehicle v) {
 		this.capacity = v.capacity;
 		this.currentCapacity = v.getCurrentCapacity();
 		this.tourLength = v.getTourLength();
@@ -203,8 +203,7 @@ public class Vehicles {
 		// checkCapacity();
 		if (droneTourPath != null)
 			for (Integer i : droneTourPath)
-				addExtraNode(node, i, drone, Main.getConsumption(2 * Main.graph.getNormalizedDistance(node, i)),
-						Main.graph.getProfit(i));
+				addExtraNode(node, i, drone, 2 * Main.graph.getNormalizedDistance(node, i), Main.graph.getProfit(i));
 		// checkCapacity();
 
 	}
@@ -213,10 +212,10 @@ public class Vehicles {
 	public String toString() {
 		String toAdd = "";
 		for (Integer node : droneTour.keySet()) {
-			toAdd += "  Node: " + node + ", Max Drone Tour: " + longestDroneTourForNode.get(node) + " \n";
+			toAdd += "  Node: " + node + ", Max Drone Tour: " + longestDroneTourForNode.get(node) + "\n";
 			for (Integer droneNode : droneTour.get(node).keySet())
-				toAdd += "   Drone: " + droneNode + ", Tour: " + droneTour.get(node).get(droneNode) + " Length: "
-						+ currentDroneTourLength.get(node).get(droneNode) + "\n";
+				toAdd += "   Drone: " + droneNode + ", Tour: " + droneTour.get(node).get(droneNode) + ", Length: "
+						+ currentDroneTourLength.get(node).get(droneNode) + ", Consumption: "+Main.getConsumption(currentDroneTourLength.get(node).get(droneNode))+"\n";
 		}
 		return "\n (" + capacity + "," + currentCapacity + ")" + tour + " LENGTH:" + tourLength + " \n Drone Tour: \n"
 				+ toAdd;
@@ -298,7 +297,6 @@ public class Vehicles {
 		tour.remove(tour.indexOf(i));
 
 		tourLength -= longestDroneTourForNode.get(i);// rimuovo la durata del tour del drone piu impegnato
-
 
 		longestDroneTourForNode.remove(i);
 		currentDroneTourLength.remove(i);

@@ -3,7 +3,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class Individual {
-	private ArrayList<Vehicles> genotypeVehicles;
+	private ArrayList<Vehicle> genotypeVehicle;
 	private double objectiveValue[] = new double[Main.numObjective];
 
 	private int front;
@@ -13,39 +13,39 @@ public class Individual {
 
 	private Set<Integer> visited;
 
-	public Individual(ArrayList<Vehicles> v) {
+	public Individual(ArrayList<Vehicle> v) {
 		visited = new TreeSet<Integer>();
 		updateSolution(v);
 	}
 
-	public void updateSolution(ArrayList<Vehicles> v) {
+	public void updateSolution(ArrayList<Vehicle> v) {
 		if (v != null) {
-			genotypeVehicles = new ArrayList<Vehicles>();
-			for (Vehicles veic : v)
-				genotypeVehicles.add(new Vehicles(veic));
+			genotypeVehicle = new ArrayList<Vehicle>();
+			for (Vehicle veic : v)
+				genotypeVehicle.add(new Vehicle(veic));
 
 		}
-		objectiveValue[0] = genotypeVehicles.size(); // numVehicles
+		objectiveValue[0] = genotypeVehicle.size(); // numVehicle
 
 		visited = new TreeSet<Integer>();
 
 		double maxLengthTour = 0;
-		for (int j = 0; j < genotypeVehicles.size(); j++) {
-			visited.addAll(genotypeVehicles.get(j).getTour());
-			if (genotypeVehicles.get(j).getTourLength() > maxLengthTour) {
-				maxLengthTour = genotypeVehicles.get(j).getTourLength();
+		for (int j = 0; j < genotypeVehicle.size(); j++) {
+			visited.addAll(genotypeVehicle.get(j).getTour());
+			if (genotypeVehicle.get(j).getTourLength() > maxLengthTour) {
+				maxLengthTour = genotypeVehicle.get(j).getTourLength();
 			}
 		}
 //		System.out.println(v + " MAX LENGTH: "+maxLengthTour);
 		objectiveValue[1] = maxLengthTour;
 
-		for (int j = 0; j < genotypeVehicles.size(); j++) {
-			visited.addAll(genotypeVehicles.get(j).getTour());
-			for (Integer node : genotypeVehicles.get(j).getTour()) {
+		for (int j = 0; j < genotypeVehicle.size(); j++) {
+			visited.addAll(genotypeVehicle.get(j).getTour());
+			for (Integer node : genotypeVehicle.get(j).getTour()) {
 				if (node != 0) {
 					for (int drone = 0; drone < Main.numDronesPerVehicle; drone++)
-						if (genotypeVehicles.get(j).getDroneTour().get(node).get(drone) != null)
-							visited.addAll(genotypeVehicles.get(j).getDroneTour().get(node).get(drone));
+						if (genotypeVehicle.get(j).getDroneTour().get(node).get(drone) != null)
+							visited.addAll(genotypeVehicle.get(j).getDroneTour().get(node).get(drone));
 				}
 			}
 		}
@@ -60,12 +60,12 @@ public class Individual {
 		return visited;
 	}
 
-	public ArrayList<Vehicles> getGenotypeVehicles() {
-		return genotypeVehicles;
+	public ArrayList<Vehicle> getGenotypeVehicle() {
+		return genotypeVehicle;
 	}
 
-	public void setGenotypeVehicles(ArrayList<Vehicles> genotypeVehicles) {
-		this.genotypeVehicles = genotypeVehicles;
+	public void setGenotypeVehicle(ArrayList<Vehicle> genotypeVehicle) {
+		this.genotypeVehicle = genotypeVehicle;
 	}
 
 	public double[] getObjectiveValue() {
@@ -110,7 +110,7 @@ public class Individual {
 
 	@Override
 	public String toString() {
-		return "\n" + "SOL: \n" + "Vehicles " + genotypeVehicles + "\n" + "\n Num vehicles =  " + objectiveValue[0]
+		return "\n" + "SOL: \n" + "Vehicle " + genotypeVehicle + "\n" + "\n Num vehicles =  " + objectiveValue[0]
 				+ "\n" + "Max length Tour =" + objectiveValue[1] + "\n" + "Profit =" + objectiveValue[2] + "] \n \n";
 
 	}

@@ -11,20 +11,20 @@ public class Main {
 	static int numObjective = 3;
 	static boolean[] maxOrMinForThatObjective = new boolean[] { true, true, false };
 	static int populationSize = 6 * 2; // numero pari
-	static double minProfitNeeded = 2000;
+	static double minProfitNeeded = 300;
 	static int numIteration = 300;
 	static double mutationProb = 0.2;
 	static double crossoverProb = 0.8;
-	static double maxBatteryConsumption = 10000;
-	static int numNodesInTheGraph = 10;
+	static double maxBatteryConsumption = 100;
+	static int numNodesInTheGraph = 3;
 	static int numExtraNodesForDroneInTheGraph = 100;
 
-	static int numDronesPerVehicle = 10;
+	static int numDronesPerVehicle = 5;
 
 	static Graph graph;
 
-	static ArrayList<Vehicles> vehicles;
-	static int numMaxVehicles = 5;
+	static ArrayList<Vehicle> vehicles;
+	static int numMaxVehicle = 5;
 
 	static HashMap<Integer, ArrayList<Integer>> reachableUsingDrone;
 
@@ -38,7 +38,7 @@ public class Main {
 		graph.print();
 
 		initReachableUsingDrone();// inizializziamo i punti potenzialmente raggiungibili dai droni per ogni nodo
-		createRandomVehicles(); // creiamo i veicoli a disposizione con capacità random
+		createRandomVehicle(); // creiamo i veicoli a disposizione con capacità random
 
 		ArrayList<Individual> P = initPopulation();
 		// System.out.println(P);
@@ -80,18 +80,21 @@ public class Main {
 
 	private static void checkSolution(ArrayList<Individual> p) {
 		for (Individual ind : p)
-			for (Vehicles v : ind.getGenotypeVehicles())
+			for (Vehicle v : ind.getGenotypeVehicle())
 				for (Integer node : v.getTour()) {
 					for (int i = 0; i < numDronesPerVehicle; i++) {
 						double duration = 0;
+						double consumption = 0;
 						if (node == 0)
 							continue;
 						if (v.getDroneTour().get(node).get(i) != null)
-							for (Integer drone : v.getDroneTour().get(node).get(i))
-								duration += getConsumption(2 * graph.getNormalizedDistance(node, drone));
-						if (duration != v.getCurrentDroneTourLength().get(node).get(i))
+							for (Integer drone : v.getDroneTour().get(node).get(i)) {
+								duration += 2 * graph.getNormalizedDistance(node, drone);
+								consumption += getConsumption(2 * graph.getNormalizedDistance(node, drone));
+							}
+						if (duration != v.getCurrentDroneTourLength().get(node).get(i) )
 							throw new RuntimeException("error computing duration");
-						if (duration > maxBatteryConsumption)
+						if (consumption > maxBatteryConsumption)
 							throw new RuntimeException("error battery consumed");
 					}
 				}
@@ -138,7 +141,7 @@ public class Main {
 		ArrayList<Individual> children = new ArrayList<Individual>();
 
 //		for (Individual i : population)
-//			for (Vehicles v : i.getGenotypeVehicles())
+//			for (Vehicle v : i.getGenotypeVehicle())
 //				v.checkCapacity();
 
 		// System.out.println(population);
@@ -147,23 +150,23 @@ public class Main {
 			// System.out.println(population.size());
 //			for (Individual i : population) {
 //				System.out.println(i);
-//				for (Vehicles v : i.getGenotypeVehicles())
+//				for (Vehicle v : i.getGenotypeVehicle())
 //					v.checkCapacity();
 //			}
 			ArrayList<Individual> copy = new ArrayList<Individual>(population);
 
-			Individual first = new Individual(copy.remove(r.nextInt(copy.size())).getGenotypeVehicles());
-			Individual second = new Individual(copy.remove(r.nextInt(copy.size())).getGenotypeVehicles());
-			Individual third = new Individual(copy.remove(r.nextInt(copy.size())).getGenotypeVehicles());
-			Individual fourth = new Individual(copy.remove(r.nextInt(copy.size())).getGenotypeVehicles());
+			Individual first = new Individual(copy.remove(r.nextInt(copy.size())).getGenotypeVehicle());
+			Individual second = new Individual(copy.remove(r.nextInt(copy.size())).getGenotypeVehicle());
+			Individual third = new Individual(copy.remove(r.nextInt(copy.size())).getGenotypeVehicle());
+			Individual fourth = new Individual(copy.remove(r.nextInt(copy.size())).getGenotypeVehicle());
 
-//			for (Vehicles v : first.getGenotypeVehicles())
+//			for (Vehicle v : first.getGenotypeVehicle())
 //				v.checkCapacity();
-//			for (Vehicles v : second.getGenotypeVehicles())
+//			for (Vehicle v : second.getGenotypeVehicle())
 //				v.checkCapacity();
-//			for (Vehicles v : third.getGenotypeVehicles())
+//			for (Vehicle v : third.getGenotypeVehicle())
 //				v.checkCapacity();
-//			for (Vehicles v : fourth.getGenotypeVehicles())
+//			for (Vehicle v : fourth.getGenotypeVehicle())
 //				v.checkCapacity();
 
 			Individual winning_first = null, winning_second = null;
@@ -180,10 +183,10 @@ public class Main {
 			else
 				winning_second = fourth;
 
-//			for (Vehicles v : winning_first.getGenotypeVehicles())
+//			for (Vehicle v : winning_first.getGenotypeVehicle())
 //				v.checkCapacity();
 //
-//			for (Vehicles v : winning_second.getGenotypeVehicles())
+//			for (Vehicle v : winning_second.getGenotypeVehicle())
 //				v.checkCapacity();
 
 			// System.out.println("FIRST \n" + winning_first + "\n SECOND \n" +
@@ -192,59 +195,59 @@ public class Main {
 			// just because the following crossover operator suppose that the vehicles in
 			// winning_first are more or equal than the ones in winning_second,
 			// we swap the two if this is not the case
-			if (winning_first.getGenotypeVehicles().size() < winning_second.getGenotypeVehicles().size()) {
-				Individual toSwap = new Individual(winning_first.getGenotypeVehicles());
-				winning_first = new Individual(winning_second.getGenotypeVehicles());
-				winning_second = new Individual(toSwap.getGenotypeVehicles());
+			if (winning_first.getGenotypeVehicle().size() < winning_second.getGenotypeVehicle().size()) {
+				Individual toSwap = new Individual(winning_first.getGenotypeVehicle());
+				winning_first = new Individual(winning_second.getGenotypeVehicle());
+				winning_second = new Individual(toSwap.getGenotypeVehicle());
 			}
 
-//			for (Vehicles v : winning_first.getGenotypeVehicles())
+//			for (Vehicle v : winning_first.getGenotypeVehicle())
 //				v.checkCapacity();
 //
-//			for (Vehicles v : winning_second.getGenotypeVehicles())
+//			for (Vehicle v : winning_second.getGenotypeVehicle())
 //				v.checkCapacity();
 
-			int childNumberOfVehicles = (winning_first.getGenotypeVehicles().size()
-					+ winning_second.getGenotypeVehicles().size()) / 2;
+			int childNumberOfVehicle = (winning_first.getGenotypeVehicle().size()
+					+ winning_second.getGenotypeVehicle().size()) / 2;
 
-			ArrayList<Vehicles> currentIndividualVehiclesFC = new ArrayList<Vehicles>();
-			ArrayList<Vehicles> currentIndividualVehiclesSC = new ArrayList<Vehicles>();
-			int crossOverPoint = r.nextInt(childNumberOfVehicles) + 1;
+			ArrayList<Vehicle> currentIndividualVehicleFC = new ArrayList<Vehicle>();
+			ArrayList<Vehicle> currentIndividualVehicleSC = new ArrayList<Vehicle>();
+			int crossOverPoint = r.nextInt(childNumberOfVehicle) + 1;
 
-			for (int i = 0; i < childNumberOfVehicles; i++) {
+			for (int i = 0; i < childNumberOfVehicle; i++) {
 				if (i < crossOverPoint) {
-					currentIndividualVehiclesFC.add(new Vehicles(winning_first.getGenotypeVehicles().get(i)));
+					currentIndividualVehicleFC.add(new Vehicle(winning_first.getGenotypeVehicle().get(i)));
 				} else {
-					if (winning_second.getGenotypeVehicles().size() - 1 - (i - crossOverPoint) >= 0) {
+					if (winning_second.getGenotypeVehicle().size() - 1 - (i - crossOverPoint) >= 0) {
 
-						currentIndividualVehiclesFC.add(new Vehicles(winning_second.getGenotypeVehicles()
-								.get(winning_second.getGenotypeVehicles().size() - 1 - (i - crossOverPoint))));
+						currentIndividualVehicleFC.add(new Vehicle(winning_second.getGenotypeVehicle()
+								.get(winning_second.getGenotypeVehicle().size() - 1 - (i - crossOverPoint))));
 					} else {
 
-						currentIndividualVehiclesFC.add(new Vehicles(
-								winning_first.getGenotypeVehicles().get(winning_first.getGenotypeVehicles().size()
-										+ (winning_second.getGenotypeVehicles().size() - 1 - (i - crossOverPoint)))));
+						currentIndividualVehicleFC.add(new Vehicle(
+								winning_first.getGenotypeVehicle().get(winning_first.getGenotypeVehicle().size()
+										+ (winning_second.getGenotypeVehicle().size() - 1 - (i - crossOverPoint)))));
 					}
 
 				}
 
-				if (crossOverPoint + i < winning_first.getGenotypeVehicles().size()) {
-					currentIndividualVehiclesSC
-							.add(new Vehicles(winning_first.getGenotypeVehicles().get(crossOverPoint + i)));
+				if (crossOverPoint + i < winning_first.getGenotypeVehicle().size()) {
+					currentIndividualVehicleSC
+							.add(new Vehicle(winning_first.getGenotypeVehicle().get(crossOverPoint + i)));
 
 				} else {
 
-					currentIndividualVehiclesSC.add(new Vehicles(winning_second.getGenotypeVehicles()
-							.get((crossOverPoint + i) % winning_first.getGenotypeVehicles().size())));
+					currentIndividualVehicleSC.add(new Vehicle(winning_second.getGenotypeVehicle()
+							.get((crossOverPoint + i) % winning_first.getGenotypeVehicle().size())));
 				}
 			}
 
-			Individual firstInd = new Individual(currentIndividualVehiclesFC);
-			Individual secondInd = new Individual(currentIndividualVehiclesSC);
+			Individual firstInd = new Individual(currentIndividualVehicleFC);
+			Individual secondInd = new Individual(currentIndividualVehicleSC);
 
-//			for (Vehicles v : firstInd.getGenotypeVehicles())
+//			for (Vehicle v : firstInd.getGenotypeVehicle())
 //				v.checkCapacity();
-//			for (Vehicles v : secondInd.getGenotypeVehicles())
+//			for (Vehicle v : secondInd.getGenotypeVehicle())
 //				v.checkCapacity();
 
 			// System.out.println("AFTER CROSSOVER \n FIRST \n" + firstInd + "\n SECOND \n"
@@ -253,9 +256,9 @@ public class Main {
 			recoverFeasibility(firstInd);
 			recoverFeasibility(secondInd);
 
-//			for (Vehicles v : firstInd.getGenotypeVehicles())
+//			for (Vehicle v : firstInd.getGenotypeVehicle())
 //				v.checkCapacity();
-//			for (Vehicles v : secondInd.getGenotypeVehicles())
+//			for (Vehicle v : secondInd.getGenotypeVehicle())
 //				v.checkCapacity();
 
 			// System.out.println("AFTER FEASIBILITY \n FIRST \n" + firstInd + "\n SECOND
@@ -264,9 +267,9 @@ public class Main {
 			mutation(firstInd);
 			mutation(secondInd);
 
-//			for (Vehicles v : firstInd.getGenotypeVehicles())
+//			for (Vehicle v : firstInd.getGenotypeVehicle())
 //				v.checkCapacity();
-//			for (Vehicles v : secondInd.getGenotypeVehicles())
+//			for (Vehicle v : secondInd.getGenotypeVehicle())
 //				v.checkCapacity();
 
 			// System.out.println("AFTER MUTATION \n FIRST \n" + firstInd + "\n SECOND \n" +
@@ -275,9 +278,9 @@ public class Main {
 			postOptimize(firstInd);
 			postOptimize(secondInd);
 
-//			for (Vehicles v : firstInd.getGenotypeVehicles())
+//			for (Vehicle v : firstInd.getGenotypeVehicle())
 //				v.checkCapacity();
-//			for (Vehicles v : secondInd.getGenotypeVehicles())
+//			for (Vehicle v : secondInd.getGenotypeVehicle())
 //				v.checkCapacity();
 
 			// System.out.println("AFTER OPTIMIZATION \n FIRST \n" + firstInd + "\n SECOND
@@ -286,9 +289,9 @@ public class Main {
 			children.add(firstInd);
 			children.add(secondInd);
 //
-//			for (Vehicles v : firstInd.getGenotypeVehicles())
+//			for (Vehicle v : firstInd.getGenotypeVehicle())
 //				v.checkCapacity();
-//			for (Vehicles v : secondInd.getGenotypeVehicles())
+//			for (Vehicle v : secondInd.getGenotypeVehicle())
 //				v.checkCapacity();
 
 		}
@@ -296,7 +299,7 @@ public class Main {
 	}
 
 	private static void postOptimize(Individual s) {
-		if (s.getGenotypeVehicles().size() == 1)
+		if (s.getGenotypeVehicle().size() == 1)
 			return;
 
 		// se un nodo è visitato più di una volta, lo lascio solo nel veicolo dove ha la
@@ -308,12 +311,12 @@ public class Main {
 				int maxTourVehicleIndex = -1;
 				int howMany = 0;
 
-				for (int j = 0; j < s.getGenotypeVehicles().size(); j++) {
-					if (s.getGenotypeVehicles().get(j).getTour().contains(i)) {
+				for (int j = 0; j < s.getGenotypeVehicle().size(); j++) {
+					if (s.getGenotypeVehicle().get(j).getTour().contains(i)) {
 						howMany++;
 						double profit = 0;
 						for (int drone = 0; drone < numDronesPerVehicle; drone++)
-							profit += s.getGenotypeVehicles().get(j).getCurrentDroneTourProfit().get(i).get(drone);
+							profit += s.getGenotypeVehicle().get(j).getCurrentDroneTourProfit().get(i).get(drone);
 						if (profit > mostProfitableTour) {
 							mostProfitableTour = profit;
 							maxTourVehicleIndex = j;
@@ -322,18 +325,18 @@ public class Main {
 				}
 
 				if (howMany >= 2) {
-					for (int j = 0; j < s.getGenotypeVehicles().size(); j++) {
-						if (j != maxTourVehicleIndex && s.getGenotypeVehicles().get(j).getTour().contains(i)) {
-							s.getGenotypeVehicles().get(j).removeNode(i);
+					for (int j = 0; j < s.getGenotypeVehicle().size(); j++) {
+						if (j != maxTourVehicleIndex && s.getGenotypeVehicle().get(j).getTour().contains(i)) {
+							s.getGenotypeVehicle().get(j).removeNode(i);
 						}
 					}
 				}
 			}
 		}
-//		System.out.println("BEFORE \n" + s.getGenotypeVehicles() + "\n END");
-		Collections.sort(s.getGenotypeVehicles(), new Comparator<Vehicles>() {
+//		System.out.println("BEFORE \n" + s.getGenotypeVehicle() + "\n END");
+		Collections.sort(s.getGenotypeVehicle(), new Comparator<Vehicle>() {
 			@Override
-			public int compare(Vehicles o1, Vehicles o2) {
+			public int compare(Vehicle o1, Vehicle o2) {
 				if (o1.getTourLength() > o2.getTourLength())
 					return 1;
 				if (o1.getTourLength() == o2.getTourLength())
@@ -345,10 +348,10 @@ public class Main {
 
 		boolean found = true;
 		while (found) {
-//			System.out.println("UPDATED \n " + s.getGenotypeVehicles());
+//			System.out.println("UPDATED \n " + s.getGenotypeVehicle());
 			found = false;
 			// controllare che il tour non sia vuoto
-			Vehicles busiest = s.getGenotypeVehicles().get(s.getGenotypeVehicles().size() - 1);
+			Vehicle busiest = s.getGenotypeVehicle().get(s.getGenotypeVehicle().size() - 1);
 			if (busiest.getTour().size() <= 1)
 				break;
 			int toAssign = busiest.getTour().get(1); // si potrebbe fare un for per ogni toAssing
@@ -362,13 +365,13 @@ public class Main {
 					for (Integer i : droneTourPath.get(drone))
 						resourceNeeded += graph.getNeededResource(i);
 
-			for (int index = 0; index < s.getGenotypeVehicles().size() - 1; index++) {
-				Vehicles v = s.getGenotypeVehicles().get(index);
+			for (int index = 0; index < s.getGenotypeVehicle().size() - 1; index++) {
+				Vehicle v = s.getGenotypeVehicle().get(index);
 				if (v.getCurrentCapacity() >= graph.getNeededResource(toAssign) + resourceNeeded && v.getTourLength()
 						+ graph.getNormalizedDistance(v.getTour().get(v.getTour().size() - 1), toAssign)
 						+ droneTour < busiest.getTourLength()) {
 
-					Vehicles avoidLoop = new Vehicles(busiest);
+					Vehicle avoidLoop = new Vehicle(busiest);
 					avoidLoop.removeNode(toAssign);
 					if (avoidLoop.getTourLength() >= busiest.getTourLength())
 						continue;
@@ -385,36 +388,36 @@ public class Main {
 					found = true;
 
 					int iter = index + 1;
-					while (iter < s.getGenotypeVehicles().size()
-							&& s.getGenotypeVehicles().get(iter).getTourLength() <= v.getTourLength())
+					while (iter < s.getGenotypeVehicle().size()
+							&& s.getGenotypeVehicle().get(iter).getTourLength() <= v.getTourLength())
 						iter++;
 
 					if (iter != index + 1) {
 						for (int i = index; i < iter - 1; i++) {
-							Vehicles swap = s.getGenotypeVehicles().get(i);
-							s.getGenotypeVehicles().set(i, s.getGenotypeVehicles().get(i + 1));
-							s.getGenotypeVehicles().set(i + 1, swap);
+							Vehicle swap = s.getGenotypeVehicle().get(i);
+							s.getGenotypeVehicle().set(i, s.getGenotypeVehicle().get(i + 1));
+							s.getGenotypeVehicle().set(i + 1, swap);
 						}
 					}
 
 					// usato perchè se devo sostituirlo con l'ultimo, arriverò al secondo while con
 					// l'elemento non più ultimo ma penultimo
 					int stride = 0;
-					if (iter == s.getGenotypeVehicles().size()) {
+					if (iter == s.getGenotypeVehicle().size()) {
 						stride = 1;
-						busiest = s.getGenotypeVehicles().get(s.getGenotypeVehicles().size() - 2);
+						busiest = s.getGenotypeVehicle().get(s.getGenotypeVehicle().size() - 2);
 					}
 
-					iter = s.getGenotypeVehicles().size() - 2;
+					iter = s.getGenotypeVehicle().size() - 2;
 
 					while (iter - stride >= 0
-							&& s.getGenotypeVehicles().get(iter - stride).getTourLength() > busiest.getTourLength())
+							&& s.getGenotypeVehicle().get(iter - stride).getTourLength() > busiest.getTourLength())
 						iter--;
-					if (iter != s.getGenotypeVehicles().size() - 2) {
-						for (int i = s.getGenotypeVehicles().size() - 1 - stride; i > iter - stride + 1; i--) {
-							Vehicles swap = s.getGenotypeVehicles().get(i);
-							s.getGenotypeVehicles().set(i, s.getGenotypeVehicles().get(i - 1));
-							s.getGenotypeVehicles().set(i - 1, swap);
+					if (iter != s.getGenotypeVehicle().size() - 2) {
+						for (int i = s.getGenotypeVehicle().size() - 1 - stride; i > iter - stride + 1; i--) {
+							Vehicle swap = s.getGenotypeVehicle().get(i);
+							s.getGenotypeVehicle().set(i, s.getGenotypeVehicle().get(i - 1));
+							s.getGenotypeVehicle().set(i - 1, swap);
 						}
 					}
 
@@ -424,7 +427,7 @@ public class Main {
 			}
 		}
 
-//		System.out.println("AFTER \n" + s.getGenotypeVehicles() + "\n END");
+//		System.out.println("AFTER \n" + s.getGenotypeVehicle() + "\n END");
 		s.updateSolution(null);
 
 	}
@@ -432,7 +435,7 @@ public class Main {
 	private static void mutation(Individual individual) {
 
 		// change position i with position j with probability equal to mutationProb
-		for (Vehicles vehicle : individual.getGenotypeVehicles()) {
+		for (Vehicle vehicle : individual.getGenotypeVehicle()) {
 			for (int i = 1; i < vehicle.getTour().size() - 1; i++) {
 				for (int j = i + 1; j < vehicle.getTour().size(); j++) {
 					if (r.nextDouble() <= mutationProb) {
@@ -451,8 +454,8 @@ public class Main {
 			int extractedRandomNode = copyNodes.get(r.nextInt(copyNodes.size()));
 			if (individual.getVisited().contains(extractedRandomNode))
 				continue;
-			Vehicles extractedRandomVehicle = individual.getGenotypeVehicles()
-					.get(r.nextInt(individual.getGenotypeVehicles().size()));
+			Vehicle extractedRandomVehicle = individual.getGenotypeVehicle()
+					.get(r.nextInt(individual.getGenotypeVehicle().size()));
 			if (extractedRandomVehicle.getCurrentCapacity() - graph.getNeededResource(extractedRandomNode) >= 0
 					&& !extractedRandomVehicle.getTour().contains(extractedRandomNode)) {
 				extractedRandomVehicle.addNode(extractedRandomNode);
@@ -466,8 +469,8 @@ public class Main {
 		for (int i = 0; i < numNodesInTheGraph; i++) {
 			if (r.nextDouble() > mutationProb)
 				continue;
-			Vehicles extractedRandomVehicle = individual.getGenotypeVehicles()
-					.get(r.nextInt(individual.getGenotypeVehicles().size()));
+			Vehicle extractedRandomVehicle = individual.getGenotypeVehicle()
+					.get(r.nextInt(individual.getGenotypeVehicle().size()));
 
 			if (extractedRandomVehicle.getTour().size() <= 1)
 				continue;
@@ -505,22 +508,22 @@ public class Main {
 			if (individual.getVisited().contains(extractedRandomNode))
 				continue;
 
-			Vehicles extractedRandomVehicle = individual.getGenotypeVehicles()
-					.get(r.nextInt(individual.getGenotypeVehicles().size()));
+			Vehicle extractedRandomVehicle = individual.getGenotypeVehicle()
+					.get(r.nextInt(individual.getGenotypeVehicle().size()));
 			if (extractedRandomVehicle.getTour().size() <= 1)
 				continue;
 			int extractedRandomNodeForAdding = extractedRandomVehicle.getTour()
 					.get(r.nextInt(extractedRandomVehicle.getTour().size() - 1) + 1);
 			int randomDrone = r.nextInt(numDronesPerVehicle);
 
-			if (extractedRandomVehicle.getCurrentDroneTourLength().get(extractedRandomNodeForAdding).get(randomDrone)
+			if (getConsumption(extractedRandomVehicle.getCurrentDroneTourLength().get(extractedRandomNodeForAdding).get(randomDrone))
 					+ getConsumption(2 * graph.getNormalizedDistance(extractedRandomNodeForAdding,
 							extractedRandomNode)) <= maxBatteryConsumption
 					&& extractedRandomVehicle.getCurrentCapacity() >= Main.graph
 							.getNeededResource(extractedRandomNode)) {
 				extractedRandomVehicle.addExtraNode(extractedRandomNodeForAdding, extractedRandomNode, randomDrone,
-						getConsumption(
-								2 * graph.getNormalizedDistance(extractedRandomNodeForAdding, extractedRandomNode)),
+
+						2 * graph.getNormalizedDistance(extractedRandomNodeForAdding, extractedRandomNode),
 						graph.getProfit(extractedRandomNode));
 			}
 
@@ -533,8 +536,8 @@ public class Main {
 		for (int i = numNodesInTheGraph; i < numNodesInTheGraph + numExtraNodesForDroneInTheGraph; i++) {
 			if (r.nextDouble() > mutationProb)
 				continue;
-			Vehicles extractedRandomVehicle = individual.getGenotypeVehicles()
-					.get(r.nextInt(individual.getGenotypeVehicles().size()));
+			Vehicle extractedRandomVehicle = individual.getGenotypeVehicle()
+					.get(r.nextInt(individual.getGenotypeVehicle().size()));
 
 			if (extractedRandomVehicle.getTour().size() <= 1)
 				continue;
@@ -553,7 +556,7 @@ public class Main {
 
 			if (currentProfit - graph.getProfit(extractedDroneNode) >= minProfitNeeded) {
 				extractedRandomVehicle.removeExtraNode(extractedRandomNode, extractedRandomDrone, extractedDroneNode,
-						getConsumption(2 * graph.getNormalizedDistance(extractedRandomNode, extractedDroneNode)),
+						2 * graph.getNormalizedDistance(extractedRandomNode, extractedDroneNode),
 						graph.getProfit(extractedDroneNode));
 				currentProfit -= graph.getProfit(extractedDroneNode);
 			}
@@ -564,7 +567,7 @@ public class Main {
 
 	// consumo in funzione della distanza d
 	public static Double getConsumption(double d) {
-		return d;
+		return 2*d;
 	}
 
 	private static void crowding_distance_assignment(ArrayList<Individual> front_i_th) {
@@ -655,17 +658,17 @@ public class Main {
 
 			// creo una lista con valori da 0 alla size dei veicoli disponibili
 			ArrayList<Integer> vehiclesIndexAvailable = new ArrayList<Integer>();
-			for (int j = 0; j < numMaxVehicles; j++)
+			for (int j = 0; j < numMaxVehicle; j++)
 				vehiclesIndexAvailable.add(j);
 
 			// decidiamo il numero di veicoli da usare nella soluzione in modo random
-			int numVehicles = r.nextInt(numMaxVehicles) + 1;
+			int numVehicle = r.nextInt(numMaxVehicle) + 1;
 
-			ArrayList<Vehicles> vehiclesToUse = new ArrayList<Vehicles>();
-			for (int j = 0; j < numVehicles; j++) {
-				Vehicles choosen = vehicles
+			ArrayList<Vehicle> vehiclesToUse = new ArrayList<Vehicle>();
+			for (int j = 0; j < numVehicle; j++) {
+				Vehicle choosen = vehicles
 						.get(vehiclesIndexAvailable.remove(r.nextInt(vehiclesIndexAvailable.size())));
-				vehiclesToUse.add(new Vehicles(choosen.getCapacity()));
+				vehiclesToUse.add(new Vehicle(choosen.getCapacity()));
 			}
 
 			ArrayList<Integer> nodesInTheGraph = new ArrayList<Integer>();
@@ -687,10 +690,10 @@ public class Main {
 				int selectedNode = nodesInTheGraph.remove(r.nextInt(nodesInTheGraph.size()));
 
 				if (r.nextDouble() <= crossoverProb) {
-					int selectedVehicles = r.nextInt(numVehicles);
-					if (vehiclesToUse.get(selectedVehicles).getCurrentCapacity() >= graph
+					int selectedVehicle = r.nextInt(numVehicle);
+					if (vehiclesToUse.get(selectedVehicle).getCurrentCapacity() >= graph
 							.getNeededResource(selectedNode)) {
-						vehiclesToUse.get(selectedVehicles).addNode(selectedNode);
+						vehiclesToUse.get(selectedVehicle).addNode(selectedNode);
 					}
 				}
 			}
@@ -699,7 +702,7 @@ public class Main {
 
 			// add node for drone for random vehicles and random node as starting point
 			for (int j = 0; j < numExtraNodesForDroneInTheGraph; j++) {
-				int randomIndex = r.nextInt(numVehicles); // veicolo scelto random
+				int randomIndex = r.nextInt(numVehicle); // veicolo scelto random
 				int sizeOfItsPath = vehiclesToUse.get(randomIndex).getTour().size();
 				if (sizeOfItsPath <= 1)
 					continue;
@@ -729,7 +732,7 @@ public class Main {
 								.getCurrentCapacity() >= graph.getNeededResource(destination)) {
 					nodesForTheDrones.remove(Integer.valueOf(destination));
 					vehiclesToUse.get(randomIndex).addExtraNode(nodeRandom, destination, droneRandom,
-							getConsumption(2 * graph.getNormalizedDistance(nodeRandom, destination)),
+							2 * graph.getNormalizedDistance(nodeRandom, destination),
 							graph.getProfit(destination));
 					energyConsumed.get(new Pair(randomIndex, nodeRandom)).replace(droneRandom,
 							energyConsumed.get(new Pair(randomIndex, nodeRandom)).get(droneRandom)
@@ -756,9 +759,9 @@ public class Main {
 		// until the feasibility is reached, the most profitable node to the most free
 		// vehicle
 
-		Collections.sort(toAdd.getGenotypeVehicles(), new Comparator<Vehicles>() {
+		Collections.sort(toAdd.getGenotypeVehicle(), new Comparator<Vehicle>() {
 			@Override
-			public int compare(Vehicles o1, Vehicles o2) {
+			public int compare(Vehicle o1, Vehicle o2) {
 				if (o1.getTourLength() < o2.getTourLength())
 					return -1;
 				else if (o1.getTourLength() == o2.getTourLength())
@@ -774,10 +777,10 @@ public class Main {
 			if (toAdd.getVisited().contains(indexNode))
 				continue;
 
-			for (int j = 0; j < toAdd.getGenotypeVehicles().size(); j++) {
-				if (toAdd.getGenotypeVehicles().get(j).getCurrentCapacity() >= graph.getNeededResource(indexNode)) {
+			for (int j = 0; j < toAdd.getGenotypeVehicle().size(); j++) {
+				if (toAdd.getGenotypeVehicle().get(j).getCurrentCapacity() >= graph.getNeededResource(indexNode)) {
 
-					toAdd.getGenotypeVehicles().get(j).addNode(indexNode);
+					toAdd.getGenotypeVehicle().get(j).addNode(indexNode);
 					added += graph.getProfit(indexNode);
 					break;
 				}
@@ -795,10 +798,10 @@ public class Main {
 				continue;
 			else {
 				// debug
-				for (int a = 0; a < toAdd.getGenotypeVehicles().size(); a++)
-					for (Integer b : toAdd.getGenotypeVehicles().get(a).getTour())
+				for (int a = 0; a < toAdd.getGenotypeVehicle().size(); a++)
+					for (Integer b : toAdd.getGenotypeVehicle().get(a).getTour())
 						for (int d = 0; d < numDronesPerVehicle; d++) {
-							HashMap<Integer, ArrayList<Integer>> check = toAdd.getGenotypeVehicles().get(a)
+							HashMap<Integer, ArrayList<Integer>> check = toAdd.getGenotypeVehicle().get(a)
 									.getDroneTour().get(b);
 							if (check != null) {
 								ArrayList<Integer> checkb = check.get(d);
@@ -809,9 +812,9 @@ public class Main {
 				// end debug
 			}
 			boolean inserted = false;
-			int startingrandom = r.nextInt(toAdd.getGenotypeVehicles().size());
-			for (int j = startingrandom; j < startingrandom + toAdd.getGenotypeVehicles().size() && !inserted; j++) {
-				Vehicles vehicle = toAdd.getGenotypeVehicles().get(j % toAdd.getGenotypeVehicles().size());
+			int startingrandom = r.nextInt(toAdd.getGenotypeVehicle().size());
+			for (int j = startingrandom; j < startingrandom + toAdd.getGenotypeVehicle().size() && !inserted; j++) {
+				Vehicle vehicle = toAdd.getGenotypeVehicle().get(j % toAdd.getGenotypeVehicle().size());
 				if (vehicle.getTour().size() <= 1)
 					continue;
 				for (Integer nodeForAdding : vehicle.getTour()) {
@@ -819,12 +822,12 @@ public class Main {
 						continue;
 					int droneRandomStart = r.nextInt(numDronesPerVehicle);
 					for (int index = droneRandomStart; index < droneRandomStart + numDronesPerVehicle; index++)
-						if (vehicle.getCurrentDroneTourLength().get(nodeForAdding).get(index % numDronesPerVehicle)
+						if (getConsumption(vehicle.getCurrentDroneTourLength().get(nodeForAdding).get(index % numDronesPerVehicle))
 								+ getConsumption(
 										2 * graph.getNormalizedDistance(nodeForAdding, i)) <= maxBatteryConsumption
 								&& vehicle.getCurrentCapacity() >= Main.graph.getNeededResource(i)) {
 							vehicle.addExtraNode(nodeForAdding, i, index % numDronesPerVehicle,
-									getConsumption(2 * graph.getNormalizedDistance(nodeForAdding, i)),
+									2 * graph.getNormalizedDistance(nodeForAdding, i),
 									graph.getProfit(i));
 							inserted = true;
 							added += Main.graph.getProfit(i);
@@ -859,14 +862,14 @@ public class Main {
 		});
 	}
 
-	private static void createRandomVehicles() {
-		vehicles = new ArrayList<Vehicles>();
-		for (int i = 0; i < numMaxVehicles; i++) {
+	private static void createRandomVehicle() {
+		vehicles = new ArrayList<Vehicle>();
+		for (int i = 0; i < numMaxVehicle; i++) {
 			boolean capacity = r.nextBoolean();
 			if (capacity)
-				vehicles.add(new Vehicles(1000));
+				vehicles.add(new Vehicle(100));
 			else
-				vehicles.add(new Vehicles(2000));
+				vehicles.add(new Vehicle(200));
 		}
 	}
 
