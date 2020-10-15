@@ -11,6 +11,7 @@ public class Vehicle {
 	private HashMap<Integer, HashMap<Integer, ArrayList<Integer>>> droneTour;
 	private HashMap<Integer, Double> longestDroneTourForNode;
 	private HashMap<Integer, HashMap<Integer, Double>> currentDroneTourLength;
+	private HashMap<Integer, HashMap<Integer, Double>> currentDroneEnergyUsed;
 	private HashMap<Integer, HashMap<Integer, Double>> currentDroneTourProfit;
 
 	public Vehicle(int capacity) {
@@ -24,6 +25,7 @@ public class Vehicle {
 		this.droneTour = new HashMap<Integer, HashMap<Integer, ArrayList<Integer>>>();
 		this.longestDroneTourForNode = new HashMap<Integer, Double>();
 		this.currentDroneTourLength = new HashMap<Integer, HashMap<Integer, Double>>();
+		this.currentDroneEnergyUsed = new HashMap<Integer, HashMap<Integer, Double>>();
 		this.currentDroneTourProfit = new HashMap<Integer, HashMap<Integer, Double>>();
 		// checkCapacity();
 
@@ -60,6 +62,16 @@ public class Vehicle {
 						v.getCurrentDroneTourLength().get(keynode).get(keydrone));
 			}
 		}
+
+		this.currentDroneEnergyUsed = new HashMap<Integer, HashMap<Integer, Double>>();
+		for (Integer keynode : v.getCurrentDroneEnergyUsed().keySet()) {
+			currentDroneEnergyUsed.put(keynode, new HashMap<Integer, Double>());
+			for (Integer keydrone : v.getCurrentDroneEnergyUsed().get(keynode).keySet()) {
+				currentDroneEnergyUsed.get(keynode).put(keydrone,
+						v.getCurrentDroneEnergyUsed().get(keynode).get(keydrone));
+			}
+		}
+
 		this.currentDroneTourProfit = new HashMap<Integer, HashMap<Integer, Double>>();
 		for (Integer keynode : v.getCurrentDroneTourProfit().keySet()) {
 			currentDroneTourProfit.put(keynode, new HashMap<Integer, Double>());
@@ -128,6 +140,10 @@ public class Vehicle {
 		return currentDroneTourProfit;
 	}
 
+	public HashMap<Integer, HashMap<Integer, Double>> getCurrentDroneEnergyUsed() {
+		return currentDroneEnergyUsed;
+	}
+
 	public void setCurrentDroneTourProfit(HashMap<Integer, HashMap<Integer, Double>> currentDroneTourProfit) {
 		this.currentDroneTourProfit = currentDroneTourProfit;
 	}
@@ -148,8 +164,12 @@ public class Vehicle {
 			if (currentDroneTourProfit.get(selectedNode) == null)
 				currentDroneTourProfit.put(selectedNode, new HashMap<Integer, Double>());
 
+			if (currentDroneEnergyUsed.get(selectedNode) == null)
+				currentDroneEnergyUsed.put(selectedNode, new HashMap<Integer, Double>());
+
 			currentDroneTourLength.get(selectedNode).put(i, 0.);
 			currentDroneTourProfit.get(selectedNode).put(i, 0.);
+			currentDroneEnergyUsed.get(selectedNode).put(i, 0.);
 		}
 		// checkCapacity();
 	}
@@ -195,6 +215,10 @@ public class Vehicle {
 
 		currentDroneTourProfit.get(startingNode).replace(selectedDrone,
 				currentDroneTourProfit.get(startingNode).get(selectedDrone) + profit);
+
+		currentDroneEnergyUsed.get(startingNode).replace(selectedDrone,
+				currentDroneEnergyUsed.get(startingNode).get(selectedDrone)
+						+ Main.getConsumption(startingNode, selectedNode));
 		// checkCapacity();
 
 	}
@@ -215,7 +239,8 @@ public class Vehicle {
 			toAdd += "  Node: " + node + ", Max Drone Tour: " + longestDroneTourForNode.get(node) + "\n";
 			for (Integer droneNode : droneTour.get(node).keySet())
 				toAdd += "   Drone: " + droneNode + ", Tour: " + droneTour.get(node).get(droneNode) + ", Length: "
-						+ currentDroneTourLength.get(node).get(droneNode) + ", Consumption: "+Main.getConsumption(currentDroneTourLength.get(node).get(droneNode))+"\n";
+						+ currentDroneTourLength.get(node).get(droneNode) + ", Consumption: "
+						+ currentDroneEnergyUsed.get(node).get(droneNode) + "\n";
 		}
 		return "\n (" + capacity + "," + currentCapacity + ")" + tour + " LENGTH:" + tourLength + " \n Drone Tour: \n"
 				+ toAdd;
@@ -301,6 +326,7 @@ public class Vehicle {
 		longestDroneTourForNode.remove(i);
 		currentDroneTourLength.remove(i);
 		currentDroneTourProfit.remove(i);
+		currentDroneEnergyUsed.remove(i);
 		droneTour.remove(i);
 		// checkCapacity();
 
@@ -326,7 +352,8 @@ public class Vehicle {
 			currentDroneTourLength.get(k).replace(drone, currentDroneTourLength.get(k).get(drone) - normalizedDuration);
 		}
 		currentDroneTourProfit.get(k).replace(drone, currentDroneTourProfit.get(k).get(drone) - profit);
-
+		currentDroneEnergyUsed.get(k).replace(drone,
+				currentDroneEnergyUsed.get(k).get(drone) - Main.getConsumption(k, selectedNode));
 		// checkCapacity();
 
 	}
