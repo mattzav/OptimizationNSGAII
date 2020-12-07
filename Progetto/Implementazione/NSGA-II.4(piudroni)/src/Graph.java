@@ -1,46 +1,36 @@
 
 public class Graph {
 
-	private int numNodes;
-	private DurationParameters[][] arcs;
-	private double profit[];
-	private int neededResource[];
+	public int numNodes;
+	public Double[][] arcs;
+	public double profit[];
+	public int neededResource[];
+	public Pair[] coordinates;
 
 	public Graph(int numNodes) {
 		this.numNodes = numNodes;
 		this.neededResource = new int[numNodes];
 		this.profit = new double[numNodes];
-		this.arcs = new DurationParameters[numNodes][numNodes];
-		initRandom();
+		this.arcs = new Double[numNodes][numNodes];
+		this.coordinates = new Pair[numNodes];
 	}
 
-	private void initRandom() {
-		for (int i = 0; i < numNodes; i++) {
-			if (i > 0) {
-				profit[i] = 10 + 30 * ((Main.r.nextInt() % 20) + 20) % 20; // profit from 1 to 20
-				neededResource[i] = 1 + ((Main.r.nextInt() % 20) + 20) % 20; // needed resource from 1 to 20
-			} else {
-				profit[i] = 0;
-				neededResource[i] = 0;
-			}
+	public void setDistance() {
+		for (int i = 0; i < numNodes - 1; i++)
+			for (int j = i + 1; j < numNodes; j++) {
+				arcs[i][j] = Math.sqrt(Math.pow(coordinates[i].first - coordinates[j].first, 2)
+						+ Math.pow(coordinates[i].second - coordinates[j].second, 2));
+				arcs[j][i] = arcs[i][j];
+				arcs[i][i] = 0.;
 
-			for (int j = 0; j < numNodes; j++)
-				arcs[i][j] = new DurationParameters(1 + ((Main.r.nextInt() % 20) + 20) % 20,
-						1 + ((Main.r.nextInt() % 30) + 30) % 30); // valore
-			// atteso
-			// tra 0 e
-			// 20,
-			// varianza
-			// tra 0 e
-			// 30
-		}
+			}
 	}
 
 	public int getNeededResource(int i) {
 		return neededResource[i];
 	}
 
-	public DurationParameters getDuration(int i, int j) {
+	public Double getDuration(int i, int j) {
 		return arcs[i][j];
 	}
 
@@ -53,18 +43,11 @@ public class Graph {
 	}
 
 	public void print() {
-		System.out.println("Num Nodes = " + numNodes);
+
 		for (int i = 0; i < numNodes; i++)
 			for (int j = 0; j < numNodes; j++)
 				System.out.println("(" + i + "," + j + ") = " + arcs[i][j]);
-		for (int i = 0; i < numNodes; i++)
-			System.out.println("Profit " + i + " = " + profit[i]);
-		for (int i = 0; i < numNodes; i++)
-			System.out.println("Resource " + i + " = " + neededResource[i]);
-	}
-
-	public double getNormalizedDistance(int i, int j) {
-		return arcs[i][j].getExpectedDuration() * 0.75 + arcs[i][j].getVarianceDuration() * 0.25;
 
 	}
+
 }

@@ -152,7 +152,7 @@ public class Vehicle {
 
 		// checkCapacity();
 		currentCapacity -= Main.graph.getNeededResource(selectedNode);
-		tourLength += Main.graph.getNormalizedDistance(tour.get(tour.size() - 1), selectedNode);
+		tourLength += Main.graph.getDuration(tour.get(tour.size() - 1), selectedNode);
 		tour.add(selectedNode);
 
 		droneTour.put(selectedNode, new HashMap<Integer, ArrayList<Integer>>());
@@ -227,7 +227,7 @@ public class Vehicle {
 		// checkCapacity();
 		if (droneTourPath != null)
 			for (Integer i : droneTourPath)
-				addExtraNode(node, i, drone, 2 * Main.graph.getNormalizedDistance(node, i), Main.graph.getProfit(i));
+				addExtraNode(node, i, drone, 2 * Main.graph.getDuration(node, i), Main.graph.getProfit(i));
 		// checkCapacity();
 
 	}
@@ -248,47 +248,38 @@ public class Vehicle {
 
 	public void swap(int i, int j) {
 		// checkCapacity();
-		DurationParameters duration = Main.graph.getDuration(tour.get(i - 1), tour.get(i));
-		tourLength -= duration.getExpectedDuration() * 0.75;
-		tourLength -= duration.getVarianceDuration() * 0.25;
+		Double duration = Main.graph.getDuration(tour.get(i - 1), tour.get(i));
+		tourLength -= duration;
 
 		duration = Main.graph.getDuration(tour.get(i), tour.get(i + 1));
-		tourLength -= duration.getExpectedDuration() * 0.75;
-		tourLength -= duration.getVarianceDuration() * 0.25;
+		tourLength -= duration;
 
 		if (j != i + 1) {
 			duration = Main.graph.getDuration(tour.get(j - 1), tour.get(j));
-			tourLength -= duration.getExpectedDuration() * 0.75;
-			tourLength -= duration.getVarianceDuration() * 0.25;
+			tourLength -= duration;
 		}
 
 		if (j < tour.size() - 1) {
 			duration = Main.graph.getDuration(tour.get(j), tour.get(j + 1));
-			tourLength -= duration.getExpectedDuration() * 0.75;
-			tourLength -= duration.getVarianceDuration() * 0.25;
+			tourLength -= duration;
 		}
 		duration = Main.graph.getDuration(tour.get(i - 1), tour.get(j));
-		tourLength += duration.getExpectedDuration() * 0.75;
-		tourLength += duration.getVarianceDuration() * 0.25;
+		tourLength += duration;
 
 		if (j != i + 1) {
 			duration = Main.graph.getDuration(tour.get(j), tour.get(i + 1));
-			tourLength += duration.getExpectedDuration() * 0.75;
-			tourLength += duration.getVarianceDuration() * 0.25;
+			tourLength += duration;
 
 			duration = Main.graph.getDuration(tour.get(j - 1), tour.get(i));
-			tourLength += duration.getExpectedDuration() * 0.75;
-			tourLength += duration.getVarianceDuration() * 0.25;
+			tourLength += duration;
 		} else {
 			duration = Main.graph.getDuration(tour.get(j), tour.get(i));
-			tourLength += duration.getExpectedDuration() * 0.75;
-			tourLength += duration.getVarianceDuration() * 0.25;
+			tourLength += duration;
 		}
 
 		if (j < tour.size() - 1) {
 			duration = Main.graph.getDuration(tour.get(i), tour.get(j + 1));
-			tourLength += duration.getExpectedDuration() * 0.75;
-			tourLength += duration.getVarianceDuration() * 0.25;
+			tourLength += duration;
 		}
 
 		int swap = tour.get(i);
@@ -299,18 +290,15 @@ public class Vehicle {
 
 	public void removeNode(int i) {
 		// checkCapacity();
-		DurationParameters duration = Main.graph.getDuration(tour.get(tour.indexOf(i) - 1), tour.get(tour.indexOf(i)));
-		tourLength -= duration.getExpectedDuration() * 0.75;
-		tourLength -= duration.getVarianceDuration() * 0.25;
+		Double duration = Main.graph.getDuration(tour.get(tour.indexOf(i) - 1), tour.get(tour.indexOf(i)));
+		tourLength -= duration;
 
 		if (tour.indexOf(i) < tour.size() - 1) {
 			duration = Main.graph.getDuration(tour.get(tour.indexOf(i)), tour.get(tour.indexOf(i) + 1));
-			tourLength -= duration.getExpectedDuration() * 0.75;
-			tourLength -= duration.getVarianceDuration() * 0.25;
+			tourLength -= duration;
 
 			duration = Main.graph.getDuration(tour.get(tour.indexOf(i) - 1), tour.get(tour.indexOf(i) + 1));
-			tourLength += duration.getExpectedDuration() * 0.75;
-			tourLength += duration.getVarianceDuration() * 0.25;
+			tourLength += duration;
 		}
 
 		currentCapacity += Main.graph.getNeededResource(i);
