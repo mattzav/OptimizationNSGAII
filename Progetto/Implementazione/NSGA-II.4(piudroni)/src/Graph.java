@@ -16,14 +16,14 @@ public class Graph {
 	}
 
 	public void setDistance() {
-		for (int i = 0; i < numNodes - 1; i++)
+		for (int i = 0; i < numNodes; i++) {
+			arcs[i][i] = 0.;
 			for (int j = i + 1; j < numNodes; j++) {
 				arcs[i][j] = Math.sqrt(Math.pow(coordinates[i].first - coordinates[j].first, 2)
 						+ Math.pow(coordinates[i].second - coordinates[j].second, 2));
 				arcs[j][i] = arcs[i][j];
-				arcs[i][i] = 0.;
-
 			}
+		}
 	}
 
 	public int getNeededResource(int i) {

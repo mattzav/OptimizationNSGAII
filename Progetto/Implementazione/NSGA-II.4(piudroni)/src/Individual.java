@@ -25,7 +25,8 @@ public class Individual {
 				genotypeVehicle.add(new Vehicle(veic));
 
 		}
-		objectiveValue[0] = genotypeVehicle.size(); // numVehicle
+
+		objectiveValue[0] = genotypeVehicle.size(); // numVehicle 
 
 		visited = new TreeSet<Integer>();
 
@@ -37,37 +38,37 @@ public class Individual {
 			}
 		}
 		// START
-
-		double totalSum = 0;
-		for (int j = 0; j < genotypeVehicle.size(); j++) {
-			double cumulative = 0;
-			int pred = 0;
-			for (Integer node : genotypeVehicle.get(j).getTour()) {
-				if (node == 0)
-					continue;
-				cumulative += Main.graph.getDuration(pred, node);
-				totalSum += cumulative;
-				double droneMax = 0;
-				for (int drone = 0; drone < Main.numDronesPerVehicle; drone++) {
-					double currDrone = 0;
-					if (genotypeVehicle.get(j).getDroneTour().get(node).get(drone) != null) {
-						for (Integer droneNode : genotypeVehicle.get(j).getDroneTour().get(node).get(drone)) {
-							totalSum += (cumulative + currDrone + Main.graph.getDuration(node, droneNode));
-							currDrone += Main.graph.getDuration(node, droneNode) * 2;
-						}
-					}
-					if (currDrone > droneMax)
-						droneMax = currDrone;
-				}
-				cumulative += droneMax;
-				pred = node;
-			}
-		}
-
-		// END
+//
+//		double totalSum = 0;
+//		for (int j = 0; j < genotypeVehicle.size(); j++) {
+//			double cumulative = 0;
+//			int pred = 0;
+//			for (Integer node : genotypeVehicle.get(j).getTour()) {
+//				if (node == 0)
+//					continue;
+//				cumulative += Main.graph.getDuration(pred, node);
+//				totalSum += cumulative;
+//				double droneMax = 0;
+//				for (int drone = 0; drone < Main.numDronesPerVehicle; drone++) {
+//					double currDrone = 0;
+//					if (genotypeVehicle.get(j).getDroneTour().get(node).get(drone) != null) {
+//						for (Integer droneNode : genotypeVehicle.get(j).getDroneTour().get(node).get(drone)) {
+//							totalSum += (cumulative + currDrone + Main.graph.getDuration(node, droneNode) / 1.5);
+//							currDrone += Main.graph.getDuration(node, droneNode) / 1.5 * 2;
+//						}
+//					}
+//					if (currDrone > droneMax)
+//						droneMax = currDrone;
+//				}
+//				cumulative += droneMax;
+//				pred = node;
+//			}
+//		}
+//
+//		// END
 
 //		System.out.println(v + " MAX LENGTH: "+maxLengthTour);
-		objectiveValue[1] = totalSum;
+		objectiveValue[1] = maxLengthTour; 
 
 		for (int j = 0; j < genotypeVehicle.size(); j++) {
 			visited.addAll(genotypeVehicle.get(j).getTour());
@@ -83,7 +84,7 @@ public class Individual {
 		double profit = 0;
 		for (Integer i : visited)
 			profit += Main.graph.getProfit(i);
-		objectiveValue[2] = profit;
+		objectiveValue[2] = profit; // MULTI obj[2]
 	}
 
 	public Set<Integer> getVisited() {
@@ -138,10 +139,11 @@ public class Individual {
 		this.dominatedBy = dominatedBy;
 	}
 
+	// MULTI
 	@Override
 	public String toString() {
-		return "\n" + "SOL: \n" + "Vehicle " + genotypeVehicle + "\n" + "\n Num vehicles =  " + objectiveValue[0] + "\n"
-				+ "Max length Tour =" + objectiveValue[1] + "\n" + "Profit =" + objectiveValue[2] + "] \n \n";
+		return "\n" + "SOL: \n" + /*"Vehicle " + genotypeVehicle + */"\n Num vehicles =  " + objectiveValue[0] +
+				"\n Max Tour =" + objectiveValue[1] + "\n" + "Profit =" + objectiveValue[2] + "] \n \n";
 
 	}
 }
